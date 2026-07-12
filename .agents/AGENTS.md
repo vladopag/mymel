@@ -17,3 +17,4 @@ These rules apply to all agents writing code in this repository.
 8. **PR Approval**: Do NOT merge Pull Requests automatically. You must always wait for the User to review and explicitly approve the PR before merging.
 9. **Strict Jira Alignment**: All work orders and branches MUST match exact Jira tickets (Epics, Stories, and Tasks). Do not combine multiple tasks if they have distinct Jira tickets.
 10. **Implementation Notes**: You must add detailed implementation notes in the Jira ticket (as a comment) and in the GitHub PR description. This is where developers summarize exactly what they changed in the code, how to test it, and any specific quirks reviewers should look out for.
+11. **Update Jira Status**: When you begin working on a task, you must immediately transition the corresponding Jira ticket to "In Progress" to accurately reflect active work.
