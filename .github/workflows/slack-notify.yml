@@ -1,0 +1,45 @@
+name: Slack Notification
+
+on:
+  pull_request:
+    types: [opened, closed]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  slack-notify:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'pull_request_review' && github.event.review.state == 'approved')
+    steps:
+      - name: Send Slack Notification
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_ACTION: ${{ github.event.action }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_USER: ${{ github.event.pull_request.user.login }}
+          PR_MERGED: ${{ github.event.pull_request.merged }}
+          REVIEW_USER: ${{ github.event.review.user.login }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            if [ "$EVENT_ACTION" = "opened" ]; then
+              TEXT="🚀 *Pull Request #$PR_NUMBER Opened* by $PR_USER\n*Title:* $PR_TITLE\n*Link:* $PR_URL"
+            elif [ "$EVENT_ACTION" = "closed" ]; then
+              if [ "$PR_MERGED" = "true" ]; then
+                TEXT="✅ *Pull Request #$PR_NUMBER Merged* by $PR_USER\n*Title:* $PR_TITLE\n*Link:* $PR_URL"
+              else
+                TEXT="❌ *Pull Request #$PR_NUMBER Closed (Unmerged)* by $PR_USER\n*Title:* $PR_TITLE\n*Link:* $PR_URL"
+              fi
+            fi
+          elif [ "$EVENT_NAME" = "pull_request_review" ]; then
+            TEXT="👍 *Pull Request #$PR_NUMBER Approved* by $REVIEW_USER\n*Title:* $PR_TITLE\n*Link:* $PR_URL"
+          fi
+          
+          # Send payload to Slack
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"$TEXT\"}" \
+            "$SLACK_WEBHOOK_URL"
