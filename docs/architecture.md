@@ -6,11 +6,15 @@
 - **Frontend**: React, Vite, TypeScript
 - **State Management**: React Query
 
-## DevOps & Workflow
-- **Containerization**: Docker & Docker Compose
-- **CI/CD**: GitHub Actions
-- **Issue Tracking**: Jira (commits & PRs must reference Jira tickets)
+## DevOps & Workflow (2026 Standard GitOps & ChatOps)
+We utilize a fully automated workflow for maximum visibility and reliability:
+
+1. **Planning & Requirements (Jira)**: Work starts with Jira User Stories containing locked-in requirements and security constraints.
+2. **Version Control & Syncing (Git & GitHub)**: Branches (e.g., `feature/JIRA-123`) link directly to Jira to automatically transition status.
+3. **CI/CD & Automated Security (GitHub Actions)**: PRs trigger tests, linting, and container vulnerability scans. A Slack webhook notifies reviewers.
+4. **ChatOps & GitOps Deployment (Slack & ArgoCD)**: Approvals and test deployments are managed via ChatOps. Merges to `main` are automatically detected and deployed by ArgoCD (GitOps).
+5. **Observability & Rollback (Prometheus & Grafana)**: Prometheus monitors live telemetry with Slack alerts. Rollbacks are performed simply by reverting git commits.
 
 ## Deployment Architecture
-- The application will be deployed as Docker containers.
-- We will have at least 3 containers: `frontend`, `backend`, and `db`.
+- Applications (frontend, backend, db) are containerized using Docker.
+- Orchestration and continuous deployment via ArgoCD.
