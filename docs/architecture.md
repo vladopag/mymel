@@ -23,3 +23,5 @@ We utilize a fully automated workflow for maximum visibility and reliability:
 1. **Slack Notifications**: `slack-notify.yml` triggers on PR events (open, closed, approved) to send webhook alerts to Slack.
 2. **Backend CI**: `backend-ci.yml` runs on pushes/PRs to `backend/**`. Sets up JDK 21, PostgreSQL 16 container, and runs Maven tests.
 3. **Frontend CI**: `frontend-ci.yml` runs on pushes/PRs to `frontend/**`. Sets up Node 20 and runs NPM tests.
+4. **Security Scan (Trivy)**: `docker-scan.yml` triggers on pushes/PRs targeting `main`. Runs a filesystem vulnerability scan using Trivy to detect package vulnerabilities and misconfigurations.
+
