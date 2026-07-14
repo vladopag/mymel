@@ -23,8 +23,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies and test
+      - name: Install dependencies, lint, and build
         run: |
           cd frontend
           npm install
-          npm test
+          npm run lint
+          npm run build

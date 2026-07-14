@@ -10,6 +10,13 @@ The backend follows a standard N-tier architecture:
   - **MediaEntry**: Core entity containing title, type, status, rating, etc.
 - `com.mymel.backend.repository`: Spring Data JPA interfaces for database access.
 
+### Frontend (React)
+The frontend implements a component-based routing architecture:
+- `frontend/src/api`: Network configuration layer.
+  - **axiosClient.ts**: Handles HTTP requests with predefined base URL (`/api/v1`) and interceptors.
+- `frontend/src/App.tsx`: Manages core routing (Home, Library, About) and leverages React Query to fetch and synchronize database entities.
+- `frontend/src/index.css`: Defines the global typography and "Tropical" variables using pure Vanilla CSS.
+
 ## Tech Stack
 - **Backend**: Java Spring Boot, Spring Data JPA
 - **Database**: PostgreSQL
