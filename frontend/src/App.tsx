@@ -52,6 +52,17 @@ function Library() {
     queryFn: () => axiosClient.get('/media'),
   })
 
+  const getStatusClass = (status: string) => {
+    return status.toLowerCase().replace(/_/g, '_');
+  };
+
+  const formatStatus = (status: string) => {
+    return status
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
   return (
     <div className="fade-in" style={{ padding: '2rem 0' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -78,6 +89,50 @@ function Library() {
           <h3 style={{ marginBottom: '0.5rem' }}>Your Library is Empty</h3>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>No movies, anime, or games have been added to your tracker yet.</p>
           <button className="btn">Add Your First Item</button>
+        </div>
+      )}
+
+      {(!isLoading && mediaList && mediaList.length > 0) && (
+        <div className="glass-card glass-table-container" style={{ padding: '1rem' }}>
+          <table className="glass-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Rating</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mediaList.map((media) => (
+                <tr key={media.id}>
+                  <td style={{ fontWeight: 600 }}>{media.title}</td>
+                  <td>
+                    <span style={{ fontSize: '0.85rem', textTransform: 'capitalize', color: 'var(--text-secondary)' }}>
+                      {media.type.toLowerCase()}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`status-chip ${getStatusClass(media.status)}`}>
+                      {formatStatus(media.status)}
+                    </span>
+                  </td>
+                  <td>
+                    <span style={{ color: 'var(--accent-gold)', fontWeight: 'bold' }}>
+                      {media.rating > 0 ? `${media.rating} / 10` : 'Unrated'}
+                    </span>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button className="btn btn-sm" style={{ background: 'var(--glass-bg)', color: 'var(--text-main)' }}>Edit</button>
+                      <button className="btn btn-sm" style={{ background: 'rgba(248, 113, 113, 0.1)', color: '#f87171', borderColor: 'rgba(248, 113, 113, 0.2)' }}>Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
