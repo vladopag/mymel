@@ -2,9 +2,9 @@
 
 :root {
   /* Tropical Theme Color System */
-  --primary-color: #406c9c;         /* San Marino Blue */
-  --primary-dark: #2d5075;
-  --primary-light: #648cb7;
+  --primary-color: #5b8bc4;         /* Lighter San Marino Blue */
+  --primary-dark: #406c9c;
+  --primary-light: #8cb4e2;
   --accent-gold: #ffd700;          /* Tropical Accent (Gold) */
   --accent-sand: #f3e5ab;          /* Sand Accent */
   
