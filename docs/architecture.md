@@ -1,5 +1,15 @@
 # Architecture Document
 
+## Code Architecture
+
+### Backend (Spring Boot)
+The backend follows a standard N-tier architecture:
+- `com.mymel.backend.controller`: REST endpoints handling HTTP requests.
+  - **MediaEntryController**: Exposes `/api/v1/media` for standard CRUD operations on media items.
+- `com.mymel.backend.model`: JPA entities mapping to database tables.
+  - **MediaEntry**: Core entity containing title, type, status, rating, etc.
+- `com.mymel.backend.repository`: Spring Data JPA interfaces for database access.
+
 ## Tech Stack
 - **Backend**: Java Spring Boot, Spring Data JPA
 - **Database**: PostgreSQL
