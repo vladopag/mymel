@@ -48,5 +48,6 @@ MyMEL implements a secure stateless JWT authentication architecture:
 2. **HTTP-only Cookies (XSS Protection)**: Upon successful login/registration, the backend generates a signed JSON Web Token (JWT) using HMAC-SHA-256 and transmits it to the client inside an `HttpOnly` and `Secure` cookie named `mymel_token`. This prevents cross-site scripting (XSS) attacks from reading the token.
 3. **Spring Security Integration**: All endpoints under `/api/v1/media/**` are protected by a stateless `JwtAuthenticationFilter` that intercepts requests, extracts the token from the cookie, validates it, and establishes the authenticated security context.
 4. **Data Scoping (Privacy)**: Media entries are private and mapped to specific user accounts via a `@ManyToOne` relationship. The backend restricts CRUD operations on media items to only those belonging to the currently authenticated user.
+5. **Deployment Note (Secure Cookie)**: The JWT cookie is currently set to `secure(false)` for local HTTP development. Before deploying to staging or production, this MUST be externalized (e.g., via `application.properties`) and set to `true` to ensure the cookie is only transmitted over HTTPS.
 
 

@@ -26,7 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const currentUser = await axiosClient.get<any, User>('/auth/me');
+        const currentUser = await axiosClient.get<unknown, User>('/auth/me');
         setUser(currentUser);
       } catch (error) {
         setUser(null);
@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (username: string, password: string) => {
     setIsLoading(true);
     try {
-      const loggedInUser = await axiosClient.post<any, User>('/auth/login', { username, password });
+      const loggedInUser = await axiosClient.post<unknown, User>('/auth/login', { username, password });
       setUser(loggedInUser);
     } catch (error) {
       setUser(null);
@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (username: string, email: string, password: string) => {
     setIsLoading(true);
     try {
-      const registeredUser = await axiosClient.post<any, User>('/auth/register', { username, email, password });
+      const registeredUser = await axiosClient.post<unknown, User>('/auth/register', { username, email, password });
       setUser(registeredUser);
     } catch (error) {
       setUser(null);
@@ -87,6 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

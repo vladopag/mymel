@@ -18,8 +18,9 @@ export default function Login() {
     try {
       await login(username, password);
       navigate('/library');
-    } catch (err: any) {
-      setError(err.response?.data || 'Invalid username or password');
+    } catch (err: unknown) {
+      const axiosError = err as import('axios').AxiosError<string>;
+      setError(axiosError.response?.data || 'Invalid username or password');
     } finally {
       setIsSubmitting(false);
     }

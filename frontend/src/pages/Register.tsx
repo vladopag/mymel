@@ -19,8 +19,9 @@ export default function Register() {
     try {
       await register(username, email, password);
       navigate('/library');
-    } catch (err: any) {
-      setError(err.response?.data || 'Failed to create an account');
+    } catch (err: unknown) {
+      const axiosError = err as import('axios').AxiosError<string>;
+      setError(axiosError.response?.data || 'Failed to create an account');
     } finally {
       setIsSubmitting(false);
     }
