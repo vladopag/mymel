@@ -1,13 +1,15 @@
 package com.mymel.backend.controller;
 
-import com.mymel.backend.model.MediaEntry;
-import com.mymel.backend.model.MediaStatus;
-import com.mymel.backend.model.MediaType;
+import com.mymel.backend.model.User;
+import com.mymel.backend.model.UserRole;
 import com.mymel.backend.repository.MediaEntryRepository;
+import com.mymel.backend.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,12 +27,21 @@ public class MediaEntryControllerTest {
     @Autowired
     private MediaEntryRepository repository;
 
-    @Test
-    public void testCreateAndGetMediaEntry() throws Exception {
-        // Clear repo
-        repository.deleteAll();
+    @Autowired
+    private UserRepository userRepository;
 
-        // 1. Create a new entry via POST
+    @BeforeEach
+    public void setUp() {
+        repository.deleteAll();
+        userRepository.deleteAll();
+
+        User user = new User("testuser", "test@mymel.com", "password", UserRole.USER);
+        userRepository.save(user);
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    public void testCreateAndGetMediaEntry() throws Exception {
         String requestJson = """
                 {
                     "title": "Steins;Gate",
@@ -48,7 +59,6 @@ public class MediaEntryControllerTest {
                 .andExpect(jsonPath("$.title").value("Steins;Gate"))
                 .andExpect(jsonPath("$.type").value("ANIME"));
 
-        // 2. Retrieve the entries via GET
         mockMvc.perform(get("/api/v1/media"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].title").value("Steins;Gate"))

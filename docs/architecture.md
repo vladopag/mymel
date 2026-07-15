@@ -42,3 +42,11 @@ We utilize a fully automated workflow for maximum visibility and reliability:
 3. **Frontend CI**: `frontend-ci.yml` runs on pushes/PRs to `frontend/**`. Sets up Node 20 and runs NPM tests.
 4. **Security Scan (Trivy)**: `docker-scan.yml` triggers on pushes/PRs targeting `main`. Runs a filesystem vulnerability scan using Trivy to detect package vulnerabilities and misconfigurations.
 
+## Authentication & Security
+MyMEL implements a secure stateless JWT authentication architecture:
+1. **User Identity & BCrypt**: User accounts are defined by the `User` entity containing `username`, `email`, and a BCrypt-encoded `passwordHash`.
+2. **HTTP-only Cookies (XSS Protection)**: Upon successful login/registration, the backend generates a signed JSON Web Token (JWT) using HMAC-SHA-256 and transmits it to the client inside an `HttpOnly` and `Secure` cookie named `mymel_token`. This prevents cross-site scripting (XSS) attacks from reading the token.
+3. **Spring Security Integration**: All endpoints under `/api/v1/media/**` are protected by a stateless `JwtAuthenticationFilter` that intercepts requests, extracts the token from the cookie, validates it, and establishes the authenticated security context.
+4. **Data Scoping (Privacy)**: Media entries are private and mapped to specific user accounts via a `@ManyToOne` relationship. The backend restricts CRUD operations on media items to only those belonging to the currently authenticated user.
+
+
