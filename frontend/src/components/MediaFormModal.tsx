@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { MediaEntry } from '../pages/Library';
 
 interface MediaFormModalProps {
@@ -48,7 +49,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
     });
   };
 
-  return (
+  return ReactDOM.createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h3 style={{ color: 'var(--accent-sand)', marginBottom: '1.5rem', fontSize: '1.5rem' }}>
@@ -123,6 +124,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
