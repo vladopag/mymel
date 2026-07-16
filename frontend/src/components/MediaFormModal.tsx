@@ -71,7 +71,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div className="form-group">
               <label htmlFor="type">Type</label>
-              <select id="type" value={type} onChange={(e) => setType(e.target.value as any)}>
+              <select id="type" value={type} onChange={(e) => setType(e.target.value as MediaEntry['type'])}>
                 <option value="MOVIE">Movie / Show</option>
                 <option value="ANIME">Anime</option>
                 <option value="GAME">Video Game</option>
@@ -80,7 +80,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
 
             <div className="form-group">
               <label htmlFor="status">Status</label>
-              <select id="status" value={status} onChange={(e) => setStatus(e.target.value as any)}>
+              <select id="status" value={status} onChange={(e) => setStatus(e.target.value as MediaEntry['status'])}>
                 <option value="PLAN_TO_WATCH">Plan to Watch</option>
                 <option value="WATCHING">Watching</option>
                 <option value="PLAYING">Playing</option>
