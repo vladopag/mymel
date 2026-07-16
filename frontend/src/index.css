@@ -244,7 +244,9 @@ button:active, .btn:active {
   -webkit-backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 5vh;
+  overflow-y: auto;
   z-index: 1000;
   animation: fadeIn var(--transition-fast) ease-out;
 }
@@ -252,6 +254,9 @@ button:active, .btn:active {
 .modal-content {
   width: 90%;
   max-width: 500px;
+  margin-bottom: 5vh;
+  max-height: 90vh;
+  overflow-y: auto;
   background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(var(--blur-amount));
   -webkit-backdrop-filter: blur(var(--blur-amount));
