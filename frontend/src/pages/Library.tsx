@@ -1,5 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axiosClient from '../api/axiosClient'
+import MediaFormModal from '../components/MediaFormModal'
 
 export interface MediaEntry {
   id: number;
@@ -10,13 +12,67 @@ export interface MediaEntry {
   episodesWatched?: number;
   totalEpisodes?: number;
   notes?: string;
+  review?: string;
+  personalNotes?: string;
 }
 
 export default function Library() {
+  const queryClient = useQueryClient()
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedMedia, setSelectedMedia] = useState<MediaEntry | null>(null)
+
   const { data: mediaList, isLoading, error } = useQuery<MediaEntry[]>({
     queryKey: ['media'],
     queryFn: () => axiosClient.get('/media'),
   })
+
+  const createMutation = useMutation({
+    mutationFn: (newMedia: Omit<MediaEntry, 'id'>) => axiosClient.post('/media', newMedia),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['media'] })
+      setIsModalOpen(false)
+    },
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Omit<MediaEntry, 'id'> }) =>
+      axiosClient.put(`/media/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['media'] })
+      setIsModalOpen(false)
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => axiosClient.delete(`/media/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['media'] })
+    },
+  })
+
+  const handleOpenAddModal = () => {
+    setSelectedMedia(null)
+    setIsModalOpen(true)
+  }
+
+  const handleOpenEditModal = (media: MediaEntry) => {
+    setSelectedMedia(media)
+    setIsModalOpen(true)
+  }
+
+  const handleDelete = (id: number) => {
+    if (window.confirm('Are you sure you want to delete this media entry?')) {
+      deleteMutation.mutate(id)
+    }
+  }
+
+  const handleFormSubmit = (formData: Omit<MediaEntry, 'id'>) => {
+    if (selectedMedia) {
+      updateMutation.mutate({ id: selectedMedia.id, data: formData })
+    } else {
+      createMutation.mutate(formData)
+    }
+  }
 
   const getStatusClass = (status: string) => {
     return status.toLowerCase().replace(/_/g, '_');
@@ -33,7 +89,7 @@ export default function Library() {
     <div className="fade-in" style={{ padding: '2rem 0' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h2>My Media Library</h2>
-        <button className="btn btn-accent">+ Add Media</button>
+        <button onClick={handleOpenAddModal} className="btn btn-accent">+ Add Media</button>
       </div>
 
       {isLoading && (
@@ -54,7 +110,7 @@ export default function Library() {
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🌴</div>
           <h3 style={{ marginBottom: '0.5rem' }}>Your Library is Empty</h3>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>No movies, anime, or games have been added to your tracker yet.</p>
-          <button className="btn">Add Your First Item</button>
+          <button onClick={handleOpenAddModal} className="btn">Add Your First Item</button>
         </div>
       )}
 
@@ -91,8 +147,8 @@ export default function Library() {
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button className="btn btn-sm" style={{ background: 'var(--glass-bg)', color: 'var(--text-main)' }}>Edit</button>
-                      <button className="btn btn-sm" style={{ background: 'rgba(248, 113, 113, 0.1)', color: '#f87171', borderColor: 'rgba(248, 113, 113, 0.2)' }}>Delete</button>
+                      <button onClick={() => handleOpenEditModal(media)} className="btn btn-sm" style={{ background: 'var(--glass-bg)', color: 'var(--text-main)' }}>Edit</button>
+                      <button onClick={() => handleDelete(media.id)} className="btn btn-sm" style={{ background: 'rgba(248, 113, 113, 0.1)', color: '#f87171', borderColor: 'rgba(248, 113, 113, 0.2)' }}>Delete</button>
                     </div>
                   </td>
                 </tr>
@@ -101,6 +157,13 @@ export default function Library() {
           </table>
         </div>
       )}
+
+      <MediaFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        media={selectedMedia}
+        onSubmit={handleFormSubmit}
+      />
     </div>
   )
 }
