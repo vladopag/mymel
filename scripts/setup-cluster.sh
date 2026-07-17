@@ -26,13 +26,13 @@ echo "=== 4. Installing ArgoCD ==="
 kubectl apply --server-side -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 echo "=== 5. Waiting for ArgoCD Server to be ready ==="
-kubectl rollout status deployment/argocd-server -n argocd --timeout=300s
+kubectl rollout status deployment/argocd-server -n argocd --timeout=300s || echo "Wait timed out, but continuing script..."
 
 echo "=== 6. Installing Prometheus & Grafana stack ==="
 kubectl create namespace monitoring
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
-helm upgrade --install prometheus prometheus-community/kube-prometheus-stack -n monitoring --wait
+helm upgrade --install prometheus prometheus-community/kube-prometheus-stack -n monitoring --wait --timeout 600s
 
 echo "=== Cluster Setup Complete! ==="
 echo "To retrieve the ArgoCD Admin password, run:"
