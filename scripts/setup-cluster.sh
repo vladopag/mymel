@@ -28,8 +28,18 @@ kubectl apply --server-side -n argocd -f https://raw.githubusercontent.com/argop
 echo "=== 5. Waiting for ArgoCD Server to be ready ==="
 kubectl rollout status deployment/argocd-server -n argocd --timeout=300s
 
+echo "=== 6. Installing Prometheus & Grafana stack ==="
+kubectl create namespace monitoring
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm upgrade --install prometheus prometheus-community/kube-prometheus-stack -n monitoring --wait
+
 echo "=== Cluster Setup Complete! ==="
 echo "To retrieve the ArgoCD Admin password, run:"
 echo "  kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath=\"{.data.password}\" | base64 -d"
 echo "To port-forward the ArgoCD Server to port 8081, run:"
 echo "  kubectl port-forward svc/argocd-server -n argocd 8081:443"
+echo "To port-forward Grafana to port 3000, run:"
+echo "  kubectl port-forward svc/prometheus-grafana -n monitoring 3000:80"
+echo "  (Default admin credentials: admin / prom-operator)"
+
