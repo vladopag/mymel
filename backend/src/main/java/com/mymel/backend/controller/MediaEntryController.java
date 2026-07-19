@@ -1,6 +1,11 @@
 package com.mymel.backend.controller;
 
 import com.mymel.backend.model.MediaEntry;
+import com.mymel.backend.model.AnimeEntry;
+import com.mymel.backend.model.MovieEntry;
+import com.mymel.backend.model.TvShowEntry;
+import com.mymel.backend.model.GameEntry;
+import com.mymel.backend.model.BookEntry;
 import com.mymel.backend.model.User;
 import com.mymel.backend.repository.MediaEntryRepository;
 import com.mymel.backend.repository.UserRepository;
@@ -67,13 +72,37 @@ public class MediaEntryController {
                         return ResponseEntity.status(HttpStatus.FORBIDDEN).<MediaEntry>build();
                     }
                     existingEntry.setTitle(mediaEntryDetails.getTitle());
-                    existingEntry.setType(mediaEntryDetails.getType());
                     existingEntry.setStatus(mediaEntryDetails.getStatus());
                     existingEntry.setRating(mediaEntryDetails.getRating());
                     existingEntry.setReview(mediaEntryDetails.getReview());
                     existingEntry.setReleaseDate(mediaEntryDetails.getReleaseDate());
                     existingEntry.setCoverImageUrl(mediaEntryDetails.getCoverImageUrl());
                     existingEntry.setPersonalNotes(mediaEntryDetails.getPersonalNotes());
+
+                    if (existingEntry instanceof AnimeEntry && mediaEntryDetails instanceof AnimeEntry) {
+                        AnimeEntry e = (AnimeEntry) existingEntry;
+                        AnimeEntry d = (AnimeEntry) mediaEntryDetails;
+                        e.setEpisodesWatched(d.getEpisodesWatched());
+                        e.setTotalEpisodes(d.getTotalEpisodes());
+                    } else if (existingEntry instanceof TvShowEntry && mediaEntryDetails instanceof TvShowEntry) {
+                        TvShowEntry e = (TvShowEntry) existingEntry;
+                        TvShowEntry d = (TvShowEntry) mediaEntryDetails;
+                        e.setEpisodesWatched(d.getEpisodesWatched());
+                        e.setTotalEpisodes(d.getTotalEpisodes());
+                    } else if (existingEntry instanceof MovieEntry && mediaEntryDetails instanceof MovieEntry) {
+                        MovieEntry e = (MovieEntry) existingEntry;
+                        MovieEntry d = (MovieEntry) mediaEntryDetails;
+                        e.setDurationMinutes(d.getDurationMinutes());
+                    } else if (existingEntry instanceof GameEntry && mediaEntryDetails instanceof GameEntry) {
+                        GameEntry e = (GameEntry) existingEntry;
+                        GameEntry d = (GameEntry) mediaEntryDetails;
+                        e.setPlatform(d.getPlatform());
+                    } else if (existingEntry instanceof BookEntry && mediaEntryDetails instanceof BookEntry) {
+                        BookEntry e = (BookEntry) existingEntry;
+                        BookEntry d = (BookEntry) mediaEntryDetails;
+                        e.setPagesRead(d.getPagesRead());
+                        e.setTotalPages(d.getTotalPages());
+                    }
                     MediaEntry updatedEntry = mediaEntryRepository.save(existingEntry);
                     return ResponseEntity.ok(updatedEntry);
                 })

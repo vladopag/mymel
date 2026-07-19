@@ -3,10 +3,27 @@ package com.mymel.backend.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 
 @Entity
 @Table(name = "media_entries")
-public class MediaEntry {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type",
+    visible = true
+)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = AnimeEntry.class, name = "ANIME"),
+    @JsonSubTypes.Type(value = MovieEntry.class, name = "MOVIE"),
+    @JsonSubTypes.Type(value = GameEntry.class, name = "GAME"),
+    @JsonSubTypes.Type(value = TvShowEntry.class, name = "TV_SHOW"),
+    @JsonSubTypes.Type(value = BookEntry.class, name = "BOOK")
+})
+public abstract class MediaEntry {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,7 +33,7 @@ public class MediaEntry {
     private String title;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "type", insertable = false, updatable = false)
     private MediaType type;
 
     @Enumerated(EnumType.STRING)
