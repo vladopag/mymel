@@ -108,4 +108,36 @@ public class MediaEntryControllerTest {
         mockMvc.perform(patch("/api/v1/media/" + saved.getId() + "/episodes").param("delta", "1"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    public void testPutUpdatePreservesEpisodesWatched() throws Exception {
+        AnimeEntry anime = new AnimeEntry();
+        anime.setTitle("Frieren");
+        anime.setStatus(MediaStatus.WATCHING);
+        anime.setRating(9);
+        anime.setEpisodesWatched(15);
+        anime.setTotalEpisodes(28);
+        anime.setUser(testUser);
+        AnimeEntry saved = repository.save(anime);
+
+        // Perform PUT update changing title, preserving episodesWatched
+        String putJson = """
+                {
+                    "title": "Frieren: Beyond Journey's End",
+                    "type": "ANIME",
+                    "status": "WATCHING",
+                    "rating": 10,
+                    "episodesWatched": 15,
+                    "totalEpisodes": 28
+                }
+                """;
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/v1/media/" + saved.getId())
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .content(putJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Frieren: Beyond Journey's End"))
+                .andExpect(jsonPath("$.episodesWatched").value(15));
+    }
 }

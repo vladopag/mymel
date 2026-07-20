@@ -82,13 +82,21 @@ public class MediaEntryController {
                     if (existingEntry instanceof AnimeEntry && mediaEntryDetails instanceof AnimeEntry) {
                         AnimeEntry e = (AnimeEntry) existingEntry;
                         AnimeEntry d = (AnimeEntry) mediaEntryDetails;
-                        e.setEpisodesWatched(d.getEpisodesWatched());
-                        e.setTotalEpisodes(d.getTotalEpisodes());
+                        if (d.getEpisodesWatched() != null) {
+                            e.setEpisodesWatched(d.getEpisodesWatched());
+                        }
+                        if (d.getTotalEpisodes() != null) {
+                            e.setTotalEpisodes(d.getTotalEpisodes());
+                        }
                     } else if (existingEntry instanceof TvShowEntry && mediaEntryDetails instanceof TvShowEntry) {
                         TvShowEntry e = (TvShowEntry) existingEntry;
                         TvShowEntry d = (TvShowEntry) mediaEntryDetails;
-                        e.setEpisodesWatched(d.getEpisodesWatched());
-                        e.setTotalEpisodes(d.getTotalEpisodes());
+                        if (d.getEpisodesWatched() != null) {
+                            e.setEpisodesWatched(d.getEpisodesWatched());
+                        }
+                        if (d.getTotalEpisodes() != null) {
+                            e.setTotalEpisodes(d.getTotalEpisodes());
+                        }
                     } else if (existingEntry instanceof MovieEntry && mediaEntryDetails instanceof MovieEntry) {
                         MovieEntry e = (MovieEntry) existingEntry;
                         MovieEntry d = (MovieEntry) mediaEntryDetails;
