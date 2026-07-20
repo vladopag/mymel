@@ -59,4 +59,73 @@ test.describe('Visual Regression Tests', () => {
     // Assert visual layout of the modal
     await expect(page).toHaveScreenshot('add-media-modal.png', { maxDiffPixelRatio: 0.05 });
   });
+
+  test('Quick Action Tracker Increments Episode Count', async ({ page }) => {
+    // Mock authentication check
+    await page.route('**/api/v1/auth/me', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 1,
+          username: 'testuser',
+          email: 'test@example.com',
+          role: 'USER'
+        })
+      });
+    });
+
+    // Mock media list retrieval
+    await page.route('**/api/v1/media', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            id: 1,
+            title: 'Frieren: Beyond Journey\'s End',
+            type: 'ANIME',
+            status: 'WATCHING',
+            rating: 10,
+            episodesWatched: 12,
+            totalEpisodes: 28
+          }
+        ])
+      });
+    });
+
+    // Mock PATCH episode quick tracker
+    let patchedDelta = 0;
+    await page.route('**/api/v1/media/1/episodes*', async (route) => {
+      const url = new URL(route.request().url());
+      patchedDelta = parseInt(url.searchParams.get('delta') || '0', 10);
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 1,
+          title: 'Frieren: Beyond Journey\'s End',
+          type: 'ANIME',
+          status: 'WATCHING',
+          rating: 10,
+          episodesWatched: 13,
+          totalEpisodes: 28
+        })
+      });
+    });
+
+    await page.goto('/library');
+
+    const quickTracker = page.locator('.quick-tracker');
+    await expect(quickTracker).toBeVisible();
+
+    const incrementBtn = quickTracker.locator('button[aria-label="Increment episode"]');
+    await expect(incrementBtn).toBeVisible();
+    await incrementBtn.click();
+
+    // Check count text updated to 13 / 28
+    const countSpan = quickTracker.locator('.quick-tracker-count');
+    await expect(countSpan).toHaveText('13 / 28');
+    expect(patchedDelta).toBe(1);
+  });
 });
