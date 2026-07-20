@@ -43,6 +43,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
+      ...(media?.episodesWatched !== undefined && { episodesWatched: media.episodesWatched }),
       title,
       type,
       status,
