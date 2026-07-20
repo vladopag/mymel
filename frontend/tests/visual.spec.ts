@@ -75,6 +75,8 @@ test.describe('Visual Regression Tests', () => {
       });
     });
 
+    let patchedDelta = 0;
+
     // Mock media list retrieval
     await page.route('**/api/v1/media', async (route) => {
       await route.fulfill({
@@ -87,7 +89,7 @@ test.describe('Visual Regression Tests', () => {
             type: 'ANIME',
             status: 'WATCHING',
             rating: 10,
-            episodesWatched: 12,
+            episodesWatched: patchedDelta > 0 ? 13 : 12,
             totalEpisodes: 28
           }
         ])
@@ -95,7 +97,6 @@ test.describe('Visual Regression Tests', () => {
     });
 
     // Mock PATCH episode quick tracker
-    let patchedDelta = 0;
     await page.route('**/api/v1/media/1/episodes*', async (route) => {
       const url = new URL(route.request().url());
       patchedDelta = parseInt(url.searchParams.get('delta') || '0', 10);
