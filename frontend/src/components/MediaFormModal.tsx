@@ -16,6 +16,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
   const [rating, setRating] = useState<number>(0);
   const [review, setReview] = useState('');
   const [personalNotes, setPersonalNotes] = useState('');
+  const [totalEpisodes, setTotalEpisodes] = useState<number | ''>('');
 
   useEffect(() => {
     if (media) {
@@ -25,6 +26,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
       setRating(media.rating || 0);
       setReview(media.review || '');
       setPersonalNotes(media.personalNotes || '');
+      setTotalEpisodes(media.totalEpisodes || '');
     } else {
       setTitle('');
       setType('MOVIE');
@@ -32,6 +34,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
       setRating(0);
       setReview('');
       setPersonalNotes('');
+      setTotalEpisodes('');
     }
   }, [media, isOpen]);
 
@@ -45,7 +48,8 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
       status,
       rating: rating > 0 ? rating : 0,
       review: review || '',
-      personalNotes: personalNotes || ''
+      personalNotes: personalNotes || '',
+      ...(totalEpisodes !== '' && { totalEpisodes: Number(totalEpisodes) })
     });
   };
 
@@ -73,7 +77,8 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
             <div className="form-group">
               <label htmlFor="type">Type</label>
               <select id="type" value={type} onChange={(e) => setType(e.target.value as MediaEntry['type'])}>
-                <option value="MOVIE">Movie / Show</option>
+                <option value="MOVIE">Movie</option>
+                <option value="TV_SHOW">TV Show</option>
                 <option value="ANIME">Anime</option>
                 <option value="GAME">Video Game</option>
               </select>
@@ -91,6 +96,20 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
               </select>
             </div>
           </div>
+
+          {(type === 'ANIME' || type === 'TV_SHOW') && (
+            <div className="form-group">
+              <label htmlFor="totalEpisodes">Total Episodes (Optional)</label>
+              <input
+                type="number"
+                id="totalEpisodes"
+                value={totalEpisodes}
+                onChange={(e) => setTotalEpisodes(e.target.value === '' ? '' : parseInt(e.target.value))}
+                min="1"
+                placeholder="e.g. 24"
+              />
+            </div>
+          )}
 
           <div className="form-group">
             <label htmlFor="rating">Rating</label>
