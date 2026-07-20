@@ -315,4 +315,64 @@ button:active, .btn:active {
   color: var(--text-main);
 }
 
+/* Quick Action Tracker Controls */
+.quick-tracker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.2rem 0.4rem;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--glass-border);
+  transition: var(--transition-fast);
+}
+
+.quick-tracker:hover {
+  border-color: var(--glass-border-hover);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.quick-tracker-btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  line-height: 1;
+}
+
+.quick-tracker-btn:hover:not(:disabled) {
+  background: var(--primary-color);
+  border-color: var(--primary-light);
+  box-shadow: 0 0 10px var(--glass-glow);
+  transform: scale(1.1);
+  color: #fff;
+}
+
+.quick-tracker-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.quick-tracker-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.quick-tracker-count {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--primary-light);
+  min-width: 50px;
+  text-align: center;
+}
+
 

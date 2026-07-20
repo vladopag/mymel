@@ -11,7 +11,7 @@ interface MediaFormModalProps {
 
 export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: MediaFormModalProps) {
   const [title, setTitle] = useState('');
-  const [type, setType] = useState<'MOVIE' | 'ANIME' | 'GAME'>('MOVIE');
+  const [type, setType] = useState<MediaEntry['type']>('MOVIE');
   const [status, setStatus] = useState<'WATCHING' | 'COMPLETED' | 'PLAN_TO_WATCH' | 'PLAYING' | 'ON_HOLD' | 'DROPPED'>('PLAN_TO_WATCH');
   const [rating, setRating] = useState<number>(0);
   const [review, setReview] = useState('');

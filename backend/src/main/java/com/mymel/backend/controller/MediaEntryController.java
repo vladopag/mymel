@@ -109,6 +109,42 @@ public class MediaEntryController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PatchMapping("/{id}/episodes")
+    public ResponseEntity<MediaEntry> quickTrackEpisodes(@PathVariable Long id, @RequestParam int delta) {
+        User currentUser = getAuthenticatedUser();
+        return mediaEntryRepository.findById(id)
+                .map(existingEntry -> {
+                    if (!existingEntry.getUser().equals(currentUser)) {
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).<MediaEntry>build();
+                    }
+
+                    if (existingEntry instanceof AnimeEntry) {
+                        AnimeEntry anime = (AnimeEntry) existingEntry;
+                        int current = anime.getEpisodesWatched() != null ? anime.getEpisodesWatched() : 0;
+                        int updated = Math.max(0, current + delta);
+                        if (anime.getTotalEpisodes() != null && anime.getTotalEpisodes() > 0) {
+                            updated = Math.min(anime.getTotalEpisodes(), updated);
+                        }
+                        anime.setEpisodesWatched(updated);
+                        MediaEntry saved = mediaEntryRepository.save(anime);
+                        return ResponseEntity.ok(saved);
+                    } else if (existingEntry instanceof TvShowEntry) {
+                        TvShowEntry tv = (TvShowEntry) existingEntry;
+                        int current = tv.getEpisodesWatched() != null ? tv.getEpisodesWatched() : 0;
+                        int updated = Math.max(0, current + delta);
+                        if (tv.getTotalEpisodes() != null && tv.getTotalEpisodes() > 0) {
+                            updated = Math.min(tv.getTotalEpisodes(), updated);
+                        }
+                        tv.setEpisodesWatched(updated);
+                        MediaEntry saved = mediaEntryRepository.save(tv);
+                        return ResponseEntity.ok(saved);
+                    } else {
+                        return ResponseEntity.badRequest().<MediaEntry>build();
+                    }
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMediaEntry(@PathVariable Long id) {
         User currentUser = getAuthenticatedUser();

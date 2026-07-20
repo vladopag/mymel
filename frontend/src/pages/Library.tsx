@@ -6,7 +6,7 @@ import MediaFormModal from '../components/MediaFormModal'
 export interface MediaEntry {
   id: number;
   title: string;
-  type: 'MOVIE' | 'ANIME' | 'GAME';
+  type: 'MOVIE' | 'ANIME' | 'GAME' | 'TV_SHOW' | 'BOOK';
   status: 'WATCHING' | 'COMPLETED' | 'PLAN_TO_WATCH' | 'PLAYING' | 'ON_HOLD' | 'DROPPED';
   rating: number;
   episodesWatched?: number;
@@ -24,6 +24,37 @@ export default function Library() {
   const { data: mediaList, isLoading, error } = useQuery<MediaEntry[]>({
     queryKey: ['media'],
     queryFn: () => axiosClient.get('/media'),
+  })
+
+  const quickTrackMutation = useMutation({
+    mutationFn: ({ id, delta }: { id: number; delta: number }) =>
+      axiosClient.patch(`/media/${id}/episodes?delta=${delta}`),
+    onMutate: async ({ id, delta }) => {
+      await queryClient.cancelQueries({ queryKey: ['media'] })
+      const previousMedia = queryClient.getQueryData<MediaEntry[]>(['media'])
+      if (previousMedia) {
+        queryClient.setQueryData<MediaEntry[]>(['media'], (old) =>
+          old?.map((item) => {
+            if (item.id === id && (item.type === 'ANIME' || item.type === 'TV_SHOW')) {
+              const current = item.episodesWatched ?? 0
+              const max = item.totalEpisodes && item.totalEpisodes > 0 ? item.totalEpisodes : Infinity
+              const updated = Math.min(max, Math.max(0, current + delta))
+              return { ...item, episodesWatched: updated }
+            }
+            return item
+          })
+        )
+      }
+      return { previousMedia }
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previousMedia) {
+        queryClient.setQueryData(['media'], context.previousMedia)
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['media'] })
+    },
   })
 
   const createMutation = useMutation({
@@ -122,6 +153,7 @@ export default function Library() {
                 <th>Title</th>
                 <th>Type</th>
                 <th>Status</th>
+                <th>Progress</th>
                 <th>Rating</th>
                 <th>Actions</th>
               </tr>
@@ -139,6 +171,37 @@ export default function Library() {
                     <span className={`status-chip ${getStatusClass(media.status)}`}>
                       {formatStatus(media.status)}
                     </span>
+                  </td>
+                  <td>
+                    {media.type === 'ANIME' || media.type === 'TV_SHOW' ? (
+                      <div className="quick-tracker">
+                        <button
+                          className="quick-tracker-btn"
+                          aria-label="Decrement episode"
+                          disabled={quickTrackMutation.isPending || (media.episodesWatched ?? 0) <= 0}
+                          onClick={() => quickTrackMutation.mutate({ id: media.id, delta: -1 })}
+                        >
+                          -
+                        </button>
+                        <span className="quick-tracker-count">
+                          {media.episodesWatched ?? 0} / {media.totalEpisodes && media.totalEpisodes > 0 ? media.totalEpisodes : '?'}
+                        </span>
+                        <button
+                          className="quick-tracker-btn"
+                          aria-label="Increment episode"
+                          disabled={
+                            quickTrackMutation.isPending ||
+                            (Boolean(media.totalEpisodes && media.totalEpisodes > 0) &&
+                              (media.episodesWatched ?? 0) >= (media.totalEpisodes ?? 0))
+                          }
+                          onClick={() => quickTrackMutation.mutate({ id: media.id, delta: 1 })}
+                        >
+                          +
+                        </button>
+                      </div>
+                    ) : (
+                      <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>N/A</span>
+                    )}
                   </td>
                   <td>
                     <span style={{ color: 'var(--accent-gold)', fontWeight: 'bold' }}>
