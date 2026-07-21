@@ -6,6 +6,7 @@ import Library from './pages/Library'
 import About from './pages/About'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import logoUrl from './assets/logo.png'
 
 function App() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -20,7 +21,7 @@ function App() {
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem', width: '100%' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 0', borderBottom: '1px solid var(--glass-border)' }}>
         <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.8rem', background: 'linear-gradient(to right, var(--accent-sand), var(--accent-gold))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          🌴 MyMEL
+          <img src={logoUrl} alt="Logo" style={{ width: '32px', height: '32px', verticalAlign: 'middle' }} /> MyMEL
         </h1>
         <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
           <Link to="/" style={{ fontWeight: 600 }}>Home</Link>
