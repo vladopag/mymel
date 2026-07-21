@@ -67,7 +67,7 @@ function App() {
       </main>
 
       <footer style={{ textAlign: 'center', padding: '3rem 0 2rem 0', color: 'var(--text-secondary)', fontSize: '0.9rem', borderTop: '1px solid var(--glass-border)', marginTop: '4rem' }}>
-        &copy; 2026 MyMEL Media Tracker. Created under GitOps Standards.
+        &copy; 2026 MyMEL - My Media List
       </footer>
     </div>
   )
