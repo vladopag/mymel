@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthProvider';
 
 export default function Login() {
-  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,7 +16,7 @@ export default function Login() {
     setIsSubmitting(true);
 
     try {
-      await login(username, password);
+      await login(identifier, password);
       navigate('/library');
     } catch (err: unknown) {
       const axiosError = err as import('axios').AxiosError<string>;
@@ -41,13 +41,14 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <label htmlFor="username" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Username</label>
+            <label htmlFor="identifier" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Username or Email</label>
             <input
               type="text"
-              id="username"
+              id="identifier"
+              placeholder="Username or Email"
               required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               style={{
                 background: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid var(--glass-border)',
