@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthProvider';
+import { SliderCaptcha } from '../components/SliderCaptcha';
 
 export default function Register() {
   const [username, setUsername] = useState('');
@@ -8,6 +9,7 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -101,7 +103,11 @@ export default function Register() {
             />
           </div>
 
-          <button type="submit" disabled={isSubmitting} className="btn btn-accent" style={{ marginTop: '0.5rem', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <SliderCaptcha onSuccess={() => setCaptchaVerified(true)} />
+          </div>
+
+          <button type="submit" disabled={isSubmitting || !captchaVerified} className="btn btn-accent" style={{ marginTop: '0.5rem', justifyContent: 'center' }}>
             {isSubmitting ? 'Registering...' : 'Sign Up'}
           </button>
         </form>
