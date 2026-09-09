@@ -28,4 +28,14 @@ public class RegisterRequest {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    private String captchaToken;
+
+    public String getCaptchaToken() {
+        return captchaToken;
+    }
+
+    public void setCaptchaToken(String captchaToken) {
+        this.captchaToken = captchaToken;
+    }
 }

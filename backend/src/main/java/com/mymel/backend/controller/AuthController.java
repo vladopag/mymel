@@ -31,8 +31,15 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private com.mymel.backend.service.HCaptchaService hCaptchaService;
+
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
+        if (!hCaptchaService.verifyToken(registerRequest.getCaptchaToken())) {
+            return ResponseEntity.badRequest().body("Error: Captcha verification failed!");
+        }
+
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             return ResponseEntity.badRequest().body("Error: Username is already taken!");
         }
