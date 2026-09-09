@@ -11,11 +11,11 @@
     "test": "playwright test"
   },
   "dependencies": {
-    "@hcaptcha/react-hcaptcha": "^2.2.0",
     "@tanstack/react-query": "^5.101.2",
     "axios": "^1.18.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-geetest-v4": "^1.2.0",
     "react-router-dom": "^6.30.4"
   },
   "devDependencies": {

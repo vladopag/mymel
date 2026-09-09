@@ -29,13 +29,40 @@ public class RegisterRequest {
         this.password = password;
     }
 
-    private String captchaToken;
+    private String captchaOutput;
+    private String genTime;
+    private String lotNumber;
+    private String passToken;
 
-    public String getCaptchaToken() {
-        return captchaToken;
+    public String getCaptchaOutput() {
+        return captchaOutput;
     }
 
-    public void setCaptchaToken(String captchaToken) {
-        this.captchaToken = captchaToken;
+    public void setCaptchaOutput(String captchaOutput) {
+        this.captchaOutput = captchaOutput;
+    }
+
+    public String getGenTime() {
+        return genTime;
+    }
+
+    public void setGenTime(String genTime) {
+        this.genTime = genTime;
+    }
+
+    public String getLotNumber() {
+        return lotNumber;
+    }
+
+    public void setLotNumber(String lotNumber) {
+        this.lotNumber = lotNumber;
+    }
+
+    public String getPassToken() {
+        return passToken;
+    }
+
+    public void setPassToken(String passToken) {
+        this.passToken = passToken;
     }
 }
