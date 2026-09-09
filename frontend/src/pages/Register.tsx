@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthProvider';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
+import GeeTest from 'react-geetest-v4';
 
 export default function Register() {
   const [username, setUsername] = useState('');
@@ -9,7 +9,7 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaResult, setCaptchaResult] = useState<any>(null);
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -17,7 +17,7 @@ export default function Register() {
     e.preventDefault();
     setError('');
 
-    if (!captchaToken) {
+    if (!captchaResult) {
       setError('Please verify you are human by completing the captcha');
       return;
     }
@@ -25,7 +25,15 @@ export default function Register() {
     setIsSubmitting(true);
 
     try {
-      await register(username, email, password, captchaToken);
+      await register(
+        username,
+        email,
+        password,
+        captchaResult.captcha_output,
+        captchaResult.gen_time,
+        captchaResult.lot_number,
+        captchaResult.pass_token
+      );
       navigate('/library');
     } catch (err: unknown) {
       const axiosError = err as import('axios').AxiosError<string>;
@@ -110,13 +118,13 @@ export default function Register() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0.5rem' }}>
-            <HCaptcha
-              sitekey="10000000-ffff-ffff-ffff-000000000001"
-              onVerify={(token) => {
-                setCaptchaToken(token);
+            <GeeTest
+              captchaId="647f5ed2ed8acb4be36784e01556bb71"
+              product="float"
+              onSuccess={(result: any) => {
+                setCaptchaResult(result);
                 setError('');
               }}
-              onExpire={() => setCaptchaToken(null)}
             />
           </div>
 

@@ -13,7 +13,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (identifier: string, password: string) => Promise<void>;
-  register: (username: string, email: string, password: string, captchaToken: string) => Promise<void>;
+  register: (username: string, email: string, password: string, captchaOutput: string, genTime: string, lotNumber: string, passToken: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -50,10 +50,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (username: string, email: string, password: string, captchaToken: string) => {
+  const register = async (username: string, email: string, password: string, captchaOutput: string, genTime: string, lotNumber: string, passToken: string) => {
     setIsLoading(true);
     try {
-      const registeredUser = await axiosClient.post<unknown, User>('/auth/register', { username, email, password, captchaToken });
+      const registeredUser = await axiosClient.post<unknown, User>('/auth/register', { username, email, password, captchaOutput, genTime, lotNumber, passToken });
       setUser(registeredUser);
     } catch (error) {
       setUser(null);

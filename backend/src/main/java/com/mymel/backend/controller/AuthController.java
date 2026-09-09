@@ -32,11 +32,16 @@ public class AuthController {
     private JwtUtils jwtUtils;
 
     @Autowired
-    private com.mymel.backend.service.HCaptchaService hCaptchaService;
+    private com.mymel.backend.service.GeetestService geetestService;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
-        if (!hCaptchaService.verifyToken(registerRequest.getCaptchaToken())) {
+        if (!geetestService.verifyToken(
+                registerRequest.getLotNumber(),
+                registerRequest.getCaptchaOutput(),
+                registerRequest.getPassToken(),
+                registerRequest.getGenTime()
+        )) {
             return ResponseEntity.badRequest().body("Error: Captcha verification failed!");
         }
 
