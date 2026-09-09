@@ -3,13 +3,20 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthProvider';
 import GeeTest from 'react-geetest-v4';
 
+interface CaptchaResult {
+  captcha_output: string;
+  gen_time: string;
+  lot_number: string;
+  pass_token: string;
+}
+
 export default function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [captchaResult, setCaptchaResult] = useState<any>(null);
+  const [captchaResult, setCaptchaResult] = useState<CaptchaResult | null>(null);
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -121,8 +128,8 @@ export default function Register() {
             <GeeTest
               captchaId="647f5ed2ed8acb4be36784e01556bb71"
               product="float"
-              onSuccess={(result: any) => {
-                setCaptchaResult(result);
+              onSuccess={(result: unknown) => {
+                setCaptchaResult(result as CaptchaResult);
                 setError('');
               }}
             />
