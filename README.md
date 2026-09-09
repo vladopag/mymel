@@ -22,3 +22,11 @@ This project strictly adheres to a **2026 GitOps & ChatOps Standard**:
 4. **GitOps Deployment**: All deployments are fully declarative and managed by ArgoCD. Merging to the `main` branch automatically syncs the live environment to the desired state.
 
 *For rules regarding AI Agents and coding standards, please review the [Agent Rules](.agents/AGENTS.md).*
+
+## 🧩 Geetest Captcha Integration
+
+We use **Geetest v4** for bot protection on the registration page. By default, it operates in `float` mode:
+- **Click to verify**: A button appears first to analyze browser fingerprint.
+- **Slider Puzzle**: If suspicious (or in local dev mode), it pops up a sliding puzzle.
+
+**Note for Developers**: In local development with Vite/React Strict Mode, or when using strict adblockers, the captcha widget may fail to load or double-render. If you experience intermittent issues with the widget not appearing, disable your adblocker for `localhost` or test in production.
