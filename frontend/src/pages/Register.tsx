@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthProvider';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 export default function Register() {
   const [username, setUsername] = useState('');
@@ -8,16 +9,23 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!captchaToken) {
+      setError('Please verify you are human by completing the captcha');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      await register(username, email, password);
+      await register(username, email, password, captchaToken);
       navigate('/library');
     } catch (err: unknown) {
       const axiosError = err as import('axios').AxiosError<string>;
@@ -98,6 +106,17 @@ export default function Register() {
                 outline: 'none',
                 transition: 'var(--transition-fast)'
               }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0.5rem' }}>
+            <HCaptcha
+              sitekey="10000000-ffff-ffff-ffff-000000000001"
+              onVerify={(token) => {
+                setCaptchaToken(token);
+                setError('');
+              }}
+              onExpire={() => setCaptchaToken(null)}
             />
           </div>
 

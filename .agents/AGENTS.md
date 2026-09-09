@@ -21,4 +21,9 @@ These rules apply to all agents writing code in this repository.
 12. **Jira-First Architecture**: ALL architectural plans, blueprints, and work orders must be placed directly into a Jira ticket (in the ticket description or comments). Do not rely on local IDE Markdown artifacts for presenting plans, as the user may not have access to the artifact viewer.
 13. **Playwright Standard**: Automated E2E testing and visual regression testing must be implemented using Microsoft Playwright. Playwright tests should be configured to detect UI defects (e.g., elements out of place, overlapping elements, visual deviations from spec).
 14. **Long-Running Task Updates**: For any command that runs asynchronously in the background (e.g., package installations, docker builds), the agent must schedule a 10-second one-shot timer using the `schedule` tool. When the timer fires, the agent must check the progress of the task, output a status update (including percentage estimation if possible), and reschedule the 10-second timer if the task is still running. This must repeat until the task completes.
-
+15. **Jira CLI Usage**: To interact with Jira (create tasks, list epics, update status), you MUST use the installed `jira` command-line tool (go-jira).
+    - **Listing Epics/Stories**: `jira issue list -t Epic` or `jira issue list -q 'parent = MYMEL-18'`
+    - **Viewing an Issue**: `jira issue view MYMEL-123`
+    - **Creating an Issue**: `jira issue create -t Task -P MYMEL-18 -s "Summary" -b "Description..." --no-input` (Ensure `--no-input` is used to prevent interactive prompts that block execution).
+    - **Updating an Issue**: `jira issue edit MYMEL-123 -b "New Description..." --no-input`
+    - **Transitioning Status**: `jira issue transition "In Progress" MYMEL-123`
