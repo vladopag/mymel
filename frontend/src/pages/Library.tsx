@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axiosClient from '../api/axiosClient'
 import MediaFormModal from '../components/MediaFormModal'
@@ -20,11 +20,53 @@ export default function Library() {
   const queryClient = useQueryClient()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState<MediaEntry | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sortConfig, setSortConfig] = useState<{ key: keyof MediaEntry | null, direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' })
 
   const { data: mediaList, isLoading, error } = useQuery<MediaEntry[]>({
     queryKey: ['media'],
     queryFn: () => axiosClient.get('/media'),
   })
+
+  const filteredAndSortedMedia = useMemo(() => {
+    if (!mediaList) return []
+
+    let result = mediaList
+
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase()
+      result = result.filter((item) => item.title.toLowerCase().includes(lowerQuery))
+    }
+
+    if (sortConfig.key) {
+      result = [...result].sort((a, b) => {
+        const key = sortConfig.key as keyof MediaEntry
+        const aVal = a[key]
+        const bVal = b[key]
+
+        if (aVal === undefined && bVal === undefined) return 0
+        if (aVal === undefined) return 1
+        if (bVal === undefined) return -1
+
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+          return sortConfig.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+        } else if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal
+        }
+
+        return 0
+      })
+    }
+
+    return result
+  }, [mediaList, searchQuery, sortConfig])
+
+  const handleSort = (key: keyof MediaEntry) => {
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
+    }))
+  }
 
   const quickTrackMutation = useMutation({
     mutationFn: ({ id, delta }: { id: number; delta: number }) =>
@@ -120,7 +162,16 @@ export default function Library() {
     <div className="fade-in" style={{ padding: '2rem 0' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h2>My Media Library</h2>
-        <button onClick={handleOpenAddModal} className="btn btn-accent">+ Add Media</button>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <input
+            type="text"
+            placeholder="Search by title..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ padding: '0.5rem 1rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-main)', color: 'var(--text-main)' }}
+          />
+          <button onClick={handleOpenAddModal} className="btn btn-accent">+ Add Media</button>
+        </div>
       </div>
 
       {isLoading && (
@@ -150,16 +201,16 @@ export default function Library() {
           <table className="glass-table">
             <thead>
               <tr>
-                <th>Title</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Progress</th>
-                <th>Rating</th>
+                <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>Title {sortConfig.key === 'title' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                <th onClick={() => handleSort('type')} style={{ cursor: 'pointer' }}>Type {sortConfig.key === 'type' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                <th onClick={() => handleSort('status')} style={{ cursor: 'pointer' }}>Status {sortConfig.key === 'status' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                <th onClick={() => handleSort('episodesWatched')} style={{ cursor: 'pointer' }}>Progress {sortConfig.key === 'episodesWatched' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+                <th onClick={() => handleSort('rating')} style={{ cursor: 'pointer' }}>Rating {sortConfig.key === 'rating' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {mediaList.map((media) => (
+              {filteredAndSortedMedia.map((media) => (
                 <tr key={media.id}>
                   <td style={{ fontWeight: 600 }}>{media.title}</td>
                   <td>
