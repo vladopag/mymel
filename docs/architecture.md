@@ -6,6 +6,9 @@
 The backend follows a standard N-tier architecture:
 - `com.mymel.backend.controller`: REST endpoints handling HTTP requests.
   - **MediaEntryController**: Exposes `/api/v1/media` for standard CRUD operations on media items.
+  - **SliderCaptchaController**: Exposes `/api/v1/captcha/create` and `/api/v1/captcha/verify` for generating and validating interactive slider puzzle challenges.
+- `com.mymel.backend.service`: Business logic layer.
+  - **SliderCaptchaService**: Generates random puzzle images using Java Graphics2D, maintains session challenge solutions, and generates one-time verification tokens with automatic TTL cleanup.
 - `com.mymel.backend.model`: JPA entities mapping to database tables.
   - **MediaEntry**: Core entity containing title, type, status, rating, etc.
 - `com.mymel.backend.repository`: Spring Data JPA interfaces for database access.
@@ -14,6 +17,7 @@ The backend follows a standard N-tier architecture:
 The frontend implements a component-based routing architecture:
 - `frontend/src/api`: Network configuration layer.
   - **axiosClient.ts**: Handles HTTP requests with predefined base URL (`/api/v1`) and interceptors.
+- `frontend/src/pages/Register.tsx`: Handles user registration with integrated `@slider-captcha/react` for bot protection without third-party API dependencies.
 - `frontend/src/App.tsx`: Manages core routing (Home, Library, About) and leverages React Query to fetch and synchronize database entities.
 - `frontend/src/index.css`: Defines the global typography and "Tropical" variables using pure Vanilla CSS.
 
@@ -50,5 +54,6 @@ MyMEL implements a secure stateless JWT authentication architecture:
 3. **Spring Security Integration**: All endpoints under `/api/v1/media/**` are protected by a stateless `JwtAuthenticationFilter` that intercepts requests, extracts the token from the cookie, validates it, and establishes the authenticated security context.
 4. **Data Scoping (Privacy)**: Media entries are private and mapped to specific user accounts via a `@ManyToOne` relationship. The backend restricts CRUD operations on media items to only those belonging to the currently authenticated user.
 5. **Deployment Note (Secure Cookie)**: The JWT cookie is currently set to `secure(false)` for local HTTP development. Before deploying to staging or production, this MUST be externalized (e.g., via `application.properties`) and set to `true` to ensure the cookie is only transmitted over HTTPS.
+6. **Self-Hosted Slider Captcha**: Replaces third-party captcha widgets with `@slider-captcha/react` and a Spring Boot backend service (`SliderCaptchaService`). Challenges are generated on-the-fly as PNG images with cut-out pieces and stored in an in-memory TTL cache with automatic cleanup. Validation requires solving the puzzle piece position within ±7px tolerance, issuing a one-time verification token required for account registration.
 
 
