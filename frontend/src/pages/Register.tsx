@@ -113,8 +113,9 @@ export default function Register() {
             <SliderCaptcha
               create="/api/v1/captcha/create"
               verify="/api/v1/captcha/verify"
-              callback={(token: string) => {
-                setCaptchaToken(token);
+              callback={(res: any) => {
+                const actualToken = res && res.token ? res.token : res;
+                setCaptchaToken(actualToken);
                 setError('');
               }}
             />
