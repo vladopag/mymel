@@ -14,14 +14,14 @@ axiosClient.interceptors.response.use(
   },
   (error) => {
     console.error('API Error:', error.response || error.message);
-    
+
     if (error.response && error.response.status === 401) {
       const path = window.location.pathname;
       if (path !== '/login' && path !== '/register') {
         window.location.href = '/login';
       }
     }
-    
+
     return Promise.reject(error);
   }
 );

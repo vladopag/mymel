@@ -10,6 +10,7 @@ export default function Register() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -30,6 +31,8 @@ export default function Register() {
     } catch (err: unknown) {
       const axiosError = err as import('axios').AxiosError<string>;
       setError(axiosError.response?.data || 'Failed to create an account');
+      setCaptchaToken(null);
+      setCaptchaKey(prev => prev + 1);
     } finally {
       setIsSubmitting(false);
     }
@@ -111,11 +114,11 @@ export default function Register() {
 
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0.5rem' }}>
             <SliderCaptcha
+              key={captchaKey}
               create="/api/v1/captcha/create"
               verify="/api/v1/captcha/verify"
-              callback={(res: any) => {
-                const actualToken = res && res.token ? res.token : res;
-                setCaptchaToken(actualToken);
+              callback={(token: string) => {
+                setCaptchaToken(token);
                 setError('');
               }}
             />
