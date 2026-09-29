@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axiosClient from '../api/axiosClient'
 import MediaFormModal from '../components/MediaFormModal'
@@ -21,7 +21,8 @@ export default function Library() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState<MediaEntry | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [sortConfig, setSortConfig] = useState<{ key: keyof MediaEntry | null, direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' })
+  const [sortConfig, setSortConfig] = useState<{ key: keyof MediaEntry | null, direction: 'asc' | 'desc' }>({ key: 'title', direction: 'asc' })
+  const progressSnapshotRef = useRef<Record<number, number>>({})
 
   const { data: mediaList, isLoading, error } = useQuery<MediaEntry[]>({
     queryKey: ['media'],
@@ -41,8 +42,13 @@ export default function Library() {
     if (sortConfig.key) {
       result = [...result].sort((a, b) => {
         const key = sortConfig.key as keyof MediaEntry
-        const aVal = a[key]
-        const bVal = b[key]
+        let aVal = a[key]
+        let bVal = b[key]
+
+        if (key === 'episodesWatched') {
+          aVal = progressSnapshotRef.current[a.id] ?? aVal ?? 0
+          bVal = progressSnapshotRef.current[b.id] ?? bVal ?? 0
+        }
 
         if (aVal === undefined && bVal === undefined) return 0
         if (aVal === undefined) return 1
@@ -51,7 +57,7 @@ export default function Library() {
         if (typeof aVal === 'string' && typeof bVal === 'string') {
           return sortConfig.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
         } else if (typeof aVal === 'number' && typeof bVal === 'number') {
-          return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal
+          return sortConfig.direction === 'asc' ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number)
         }
 
         return 0
@@ -62,6 +68,14 @@ export default function Library() {
   }, [mediaList, searchQuery, sortConfig])
 
   const handleSort = (key: keyof MediaEntry) => {
+    if (key === 'episodesWatched') {
+      const snapshot: Record<number, number> = {}
+      mediaList?.forEach(m => {
+        snapshot[m.id] = m.episodesWatched ?? 0
+      })
+      progressSnapshotRef.current = snapshot
+    }
+    
     setSortConfig((prev) => ({
       key,
       direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
