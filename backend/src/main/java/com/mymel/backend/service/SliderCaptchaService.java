@@ -154,12 +154,14 @@ public class SliderCaptchaService {
     }
 
     public String verifyChallenge(String challengeId, double userX) {
-        ChallengeData challenge = challenges.remove(challengeId);
+        ChallengeData challenge = challenges.get(challengeId);
         if (challenge == null || challenge.isExpired()) {
+            challenges.remove(challengeId); // Clean up if expired
             return null;
         }
 
         if (Math.abs(userX - challenge.getSolutionX()) <= TOLERANCE) {
+            challenges.remove(challengeId); // Only remove on success
             String token = UUID.randomUUID().toString();
             validTokens.put(token, System.currentTimeMillis());
             return token;
