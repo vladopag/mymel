@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthProvider';
-import GeeTest from 'react-geetest-v4';
-
-interface CaptchaResult {
-  captcha_output: string;
-  gen_time: string;
-  lot_number: string;
-  pass_token: string;
-}
+import SliderCaptcha from '@slider-captcha/react';
 
 export default function Register() {
   const [username, setUsername] = useState('');
@@ -16,7 +9,8 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [captchaResult, setCaptchaResult] = useState<CaptchaResult | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -24,7 +18,7 @@ export default function Register() {
     e.preventDefault();
     setError('');
 
-    if (!captchaResult) {
+    if (!captchaToken) {
       setError('Please verify you are human by completing the captcha');
       return;
     }
@@ -32,19 +26,13 @@ export default function Register() {
     setIsSubmitting(true);
 
     try {
-      await register(
-        username,
-        email,
-        password,
-        captchaResult.captcha_output,
-        captchaResult.gen_time,
-        captchaResult.lot_number,
-        captchaResult.pass_token
-      );
+      await register(username, email, password, captchaToken);
       navigate('/library');
     } catch (err: unknown) {
       const axiosError = err as import('axios').AxiosError<string>;
       setError(axiosError.response?.data || 'Failed to create an account');
+      setCaptchaToken(null);
+      setCaptchaKey(prev => prev + 1);
     } finally {
       setIsSubmitting(false);
     }
@@ -125,11 +113,12 @@ export default function Register() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0.5rem' }}>
-            <GeeTest
-              captchaId="647f5ed2ed8acb4be36784e01556bb71"
-              product="float"
-              onSuccess={(result: unknown) => {
-                setCaptchaResult(result as CaptchaResult);
+            <SliderCaptcha
+              key={captchaKey}
+              create="/api/v1/captcha/create"
+              verify="/api/v1/captcha/verify"
+              callback={(token: string) => {
+                setCaptchaToken(token);
                 setError('');
               }}
             />

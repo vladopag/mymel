@@ -27,4 +27,4 @@ These rules apply to all agents writing code in this repository.
     - **Creating an Issue**: `jira issue create -t Task -P MYMEL-18 -s "Summary" -b "Description..." --no-input` (Ensure `--no-input` is used to prevent interactive prompts that block execution).
     - **Updating an Issue**: `jira issue edit MYMEL-123 -b "New Description..." --no-input`
     - **Transitioning Status**: `jira issue transition MYMEL-123 "In Progress"`
-16. **Third-Party Widgets (Captchas, etc.)**: Always note in the PR or Jira ticket that third-party behavioral widgets (like Geetest Captcha) can be flaky in local development due to adblockers and React Strict Mode. Ensure testing and sign-off in a production-like environment before major releases.
+16. **Captcha & Third-Party Widgets**: The registration captcha is now a self-hosted `@slider-captcha` (no external API keys needed). When integrating any third-party widget, always note in the PR or Jira ticket that it must be tested in a production-like environment. Ensure captcha retry flows are tested (fail then succeed scenarios).
