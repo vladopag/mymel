@@ -77,7 +77,12 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div className="form-group">
               <label htmlFor="type">Type</label>
-              <select id="type" value={type} onChange={(e) => setType(e.target.value as MediaEntry['type'])}>
+              <select id="type" value={type} onChange={(e) => {
+                const newType = e.target.value as MediaEntry['type'];
+                setType(newType);
+                if (newType === 'GAME' && status === 'WATCHING') setStatus('PLAYING');
+                if (newType !== 'GAME' && status === 'PLAYING') setStatus('WATCHING');
+              }}>
                 <option value="MOVIE">Movie</option>
                 <option value="TV_SHOW">TV Show</option>
                 <option value="ANIME">Anime</option>
@@ -88,9 +93,12 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
             <div className="form-group">
               <label htmlFor="status">Status</label>
               <select id="status" value={status} onChange={(e) => setStatus(e.target.value as MediaEntry['status'])}>
-                <option value="PLAN_TO_WATCH">Plan to Watch</option>
-                <option value="WATCHING">Watching</option>
-                <option value="PLAYING">Playing</option>
+                <option value="PLAN_TO_WATCH">{type === 'GAME' ? 'Plan to Play' : 'Plan to Watch'}</option>
+                {type === 'GAME' ? (
+                  <option value="PLAYING">Playing</option>
+                ) : (
+                  <option value="WATCHING">Watching</option>
+                )}
                 <option value="COMPLETED">Completed</option>
                 <option value="ON_HOLD">On Hold</option>
                 <option value="DROPPED">Dropped</option>
