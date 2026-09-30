@@ -21,6 +21,8 @@ export default function Library() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState<MediaEntry | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [filters, setFilters] = useState({ type: '', status: '', rating: '' })
+  const [isMoreFiltersOpen, setIsMoreFiltersOpen] = useState(false)
   const [sortConfig, setSortConfig] = useState<{ key: keyof MediaEntry | null, direction: 'asc' | 'desc' }>({ key: 'title', direction: 'asc' })
   const progressSnapshotRef = useRef<Record<number, number>>({})
 
@@ -37,6 +39,23 @@ export default function Library() {
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase()
       result = result.filter((item) => item.title.toLowerCase().includes(lowerQuery))
+    }
+
+    if (filters.type) {
+      result = result.filter(item => item.type === filters.type)
+    }
+    
+    if (filters.status) {
+      result = result.filter(item => item.status === filters.status)
+    }
+
+    if (filters.rating) {
+      if (filters.rating === 'unrated') {
+        result = result.filter(item => !item.rating || item.rating === 0)
+      } else {
+        const exactRating = parseInt(filters.rating, 10)
+        result = result.filter(item => item.rating === exactRating)
+      }
     }
 
     if (sortConfig.key) {
@@ -65,7 +84,7 @@ export default function Library() {
     }
 
     return result
-  }, [mediaList, searchQuery, sortConfig])
+  }, [mediaList, searchQuery, sortConfig, filters])
 
   const handleSort = (key: keyof MediaEntry) => {
     if (key === 'episodesWatched') {
@@ -187,6 +206,68 @@ export default function Library() {
           <button onClick={handleOpenAddModal} className="btn btn-accent">+ Add Media</button>
         </div>
       </div>
+
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <select
+          value={filters.type}
+          onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
+          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.05)', color: '#fff' }}
+        >
+          <option value="" style={{ background: '#1e293b', color: '#fff' }}>All Types</option>
+          <option value="ANIME" style={{ background: '#1e293b', color: '#fff' }}>Anime</option>
+          <option value="MOVIE" style={{ background: '#1e293b', color: '#fff' }}>Movie</option>
+          <option value="TV_SHOW" style={{ background: '#1e293b', color: '#fff' }}>TV Show</option>
+          <option value="GAME" style={{ background: '#1e293b', color: '#fff' }}>Game</option>
+          <option value="BOOK" style={{ background: '#1e293b', color: '#fff' }}>Book</option>
+        </select>
+        <select
+          value={filters.status}
+          onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.05)', color: '#fff' }}
+        >
+          <option value="" style={{ background: '#1e293b', color: '#fff' }}>All Statuses</option>
+          <option value="WATCHING" style={{ background: '#1e293b', color: '#fff' }}>Watching</option>
+          <option value="PLAN_TO_WATCH" style={{ background: '#1e293b', color: '#fff' }}>Plan to Watch</option>
+          <option value="COMPLETED" style={{ background: '#1e293b', color: '#fff' }}>Completed</option>
+          <option value="PLAYING" style={{ background: '#1e293b', color: '#fff' }}>Playing</option>
+          <option value="ON_HOLD" style={{ background: '#1e293b', color: '#fff' }}>On Hold</option>
+          <option value="DROPPED" style={{ background: '#1e293b', color: '#fff' }}>Dropped</option>
+        </select>
+        <select
+          value={filters.rating}
+          onChange={(e) => setFilters(prev => ({ ...prev, rating: e.target.value }))}
+          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.05)', color: '#fff' }}
+        >
+          <option value="" style={{ background: '#1e293b', color: '#fff' }}>All Ratings</option>
+          <option value="10" style={{ background: '#1e293b', color: '#fff' }}>10</option>
+          <option value="9" style={{ background: '#1e293b', color: '#fff' }}>9</option>
+          <option value="8" style={{ background: '#1e293b', color: '#fff' }}>8</option>
+          <option value="7" style={{ background: '#1e293b', color: '#fff' }}>7</option>
+          <option value="6" style={{ background: '#1e293b', color: '#fff' }}>6</option>
+          <option value="5" style={{ background: '#1e293b', color: '#fff' }}>5</option>
+          <option value="4" style={{ background: '#1e293b', color: '#fff' }}>4</option>
+          <option value="3" style={{ background: '#1e293b', color: '#fff' }}>3</option>
+          <option value="2" style={{ background: '#1e293b', color: '#fff' }}>2</option>
+          <option value="1" style={{ background: '#1e293b', color: '#fff' }}>1</option>
+          <option value="unrated" style={{ background: '#1e293b', color: '#fff' }}>Unrated</option>
+        </select>
+        <button 
+          onClick={() => setIsMoreFiltersOpen(!isMoreFiltersOpen)}
+          className="btn btn-sm"
+          style={{ background: 'var(--glass-bg)', color: 'var(--text-main)' }}
+          title="More Filters"
+        >
+          +
+        </button>
+      </div>
+
+      {isMoreFiltersOpen && (
+        <div className="glass-card fade-in" style={{ padding: '1rem', marginBottom: '1.5rem', display: 'flex', gap: '1rem' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: 0, alignSelf: 'center' }}>
+            Additional filters (Tags, Authors, etc.) coming soon...
+          </p>
+        </div>
+      )}
 
       {isLoading && (
         <div style={{ textAlign: 'center', padding: '3rem' }}>
