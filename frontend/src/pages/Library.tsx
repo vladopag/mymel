@@ -138,6 +138,10 @@ export default function Library() {
       queryClient.invalidateQueries({ queryKey: ['media'] })
       setIsModalOpen(false)
     },
+    onError: (error: any) => {
+      const msg = error.response?.data?.message || JSON.stringify(error.response?.data) || error.message;
+      alert(`Failed to create entry: ${msg}`);
+    }
   })
 
   const updateMutation = useMutation({
@@ -147,6 +151,10 @@ export default function Library() {
       queryClient.invalidateQueries({ queryKey: ['media'] })
       setIsModalOpen(false)
     },
+    onError: (error: any) => {
+      const msg = error.response?.data?.message || JSON.stringify(error.response?.data) || error.message;
+      alert(`Failed to update entry: ${msg}`);
+    }
   })
 
   const deleteMutation = useMutation({
@@ -184,7 +192,16 @@ export default function Library() {
     return status.toLowerCase().replace(/_/g, '_');
   };
 
-  const formatStatus = (status: string) => {
+  const formatStatus = (status: string, type?: string) => {
+    if (type === 'GAME' && status === 'PLAN_TO_WATCH') {
+      return 'Plan To Play';
+    }
+    if (type === 'BOOK' && status === 'PLAN_TO_WATCH') {
+      return 'Plan To Read';
+    }
+    if (type === 'BOOK' && status === 'WATCHING') {
+      return 'Reading';
+    }
     return status
       .split('_')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
@@ -315,7 +332,7 @@ export default function Library() {
                   </td>
                   <td>
                     <span className={`status-chip ${getStatusClass(media.status)}`}>
-                      {formatStatus(media.status)}
+                      {formatStatus(media.status, media.type)}
                     </span>
                   </td>
                   <td>
