@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axiosClient from '../api/axiosClient'
 import MediaFormModal from '../components/MediaFormModal'
@@ -11,17 +11,75 @@ export interface MediaEntry {
   rating: number;
   episodesWatched?: number;
   totalEpisodes?: number;
-  notes?: string;
   review?: string;
   personalNotes?: string;
 }
+
+const MultiSelectDropdown = ({ options, selectedValues, onChange, placeholder }: {
+  options: { label: string; value: string }[];
+  selectedValues: string[];
+  onChange: (values: string[]) => void;
+  placeholder: string;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleOption = (value: string) => {
+    if (selectedValues.includes(value)) {
+      onChange(selectedValues.filter(v => v !== value));
+    } else {
+      onChange([...selectedValues, value]);
+    }
+  };
+
+  const displayText = selectedValues.length > 0 
+    ? options.filter(o => selectedValues.includes(o.value)).map(o => o.label).join(', ')
+    : placeholder;
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative', width: '200px' }}>
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.08)', background: 'rgba(255, 255, 255, 0.05)', color: '#fff', cursor: 'pointer', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+      >
+        <span>{displayText}</span>
+        <span style={{ fontSize: '0.8em', marginLeft: '0.5rem' }}>▼</span>
+      </div>
+      {isOpen && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#1e293b', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '4px', zIndex: 10, maxHeight: '250px', overflowY: 'auto', marginTop: '0.25rem', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.2)' }}>
+          {options.map(option => (
+            <label key={option.value} style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 0.75rem', cursor: 'pointer', color: '#fff', gap: '0.5rem', transition: 'background 0.2s' }} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}>
+              <input 
+                type="checkbox" 
+                checked={selectedValues.includes(option.value)}
+                onChange={() => toggleOption(option.value)}
+                style={{ cursor: 'pointer' }}
+              />
+              {option.label}
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function Library() {
   const queryClient = useQueryClient()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState<MediaEntry | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [filters, setFilters] = useState({ type: '', status: '', rating: '' })
+  const [filters, setFilters] = useState<{ type: string[], status: string[], rating: string[] }>({ type: [], status: [], rating: [] })
   const [isMoreFiltersOpen, setIsMoreFiltersOpen] = useState(false)
   const [sortConfig, setSortConfig] = useState<{ key: keyof MediaEntry | null, direction: 'asc' | 'desc' }>({ key: 'title', direction: 'asc' })
   const progressSnapshotRef = useRef<Record<number, number>>({})
@@ -41,21 +99,19 @@ export default function Library() {
       result = result.filter((item) => item.title.toLowerCase().includes(lowerQuery))
     }
 
-    if (filters.type) {
-      result = result.filter(item => item.type === filters.type)
+    if (filters.type.length > 0) {
+      result = result.filter(item => filters.type.includes(item.type))
     }
     
-    if (filters.status) {
-      result = result.filter(item => item.status === filters.status)
+    if (filters.status.length > 0) {
+      result = result.filter(item => filters.status.includes(item.status))
     }
 
-    if (filters.rating) {
-      if (filters.rating === 'unrated') {
-        result = result.filter(item => !item.rating || item.rating === 0)
-      } else {
-        const exactRating = parseInt(filters.rating, 10)
-        result = result.filter(item => item.rating === exactRating)
-      }
+    if (filters.rating.length > 0) {
+      result = result.filter(item => {
+        if (filters.rating.includes('unrated') && (!item.rating || item.rating === 0)) return true;
+        return filters.rating.some(r => r !== 'unrated' && parseInt(r, 10) === item.rating);
+      });
     }
 
     if (sortConfig.key) {
@@ -224,50 +280,50 @@ export default function Library() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <select
-          value={filters.type}
-          onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
-          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.05)', color: '#fff' }}
-        >
-          <option value="" style={{ background: '#1e293b', color: '#fff' }}>All Types</option>
-          <option value="ANIME" style={{ background: '#1e293b', color: '#fff' }}>Anime</option>
-          <option value="MOVIE" style={{ background: '#1e293b', color: '#fff' }}>Movie</option>
-          <option value="TV_SHOW" style={{ background: '#1e293b', color: '#fff' }}>TV Show</option>
-          <option value="GAME" style={{ background: '#1e293b', color: '#fff' }}>Game</option>
-          <option value="BOOK" style={{ background: '#1e293b', color: '#fff' }}>Book</option>
-        </select>
-        <select
-          value={filters.status}
-          onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.05)', color: '#fff' }}
-        >
-          <option value="" style={{ background: '#1e293b', color: '#fff' }}>All Statuses</option>
-          <option value="WATCHING" style={{ background: '#1e293b', color: '#fff' }}>Watching</option>
-          <option value="PLAN_TO_WATCH" style={{ background: '#1e293b', color: '#fff' }}>Plan to Watch</option>
-          <option value="COMPLETED" style={{ background: '#1e293b', color: '#fff' }}>Completed</option>
-          <option value="PLAYING" style={{ background: '#1e293b', color: '#fff' }}>Playing</option>
-          <option value="ON_HOLD" style={{ background: '#1e293b', color: '#fff' }}>On Hold</option>
-          <option value="DROPPED" style={{ background: '#1e293b', color: '#fff' }}>Dropped</option>
-        </select>
-        <select
-          value={filters.rating}
-          onChange={(e) => setFilters(prev => ({ ...prev, rating: e.target.value }))}
-          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.05)', color: '#fff' }}
-        >
-          <option value="" style={{ background: '#1e293b', color: '#fff' }}>All Ratings</option>
-          <option value="10" style={{ background: '#1e293b', color: '#fff' }}>10</option>
-          <option value="9" style={{ background: '#1e293b', color: '#fff' }}>9</option>
-          <option value="8" style={{ background: '#1e293b', color: '#fff' }}>8</option>
-          <option value="7" style={{ background: '#1e293b', color: '#fff' }}>7</option>
-          <option value="6" style={{ background: '#1e293b', color: '#fff' }}>6</option>
-          <option value="5" style={{ background: '#1e293b', color: '#fff' }}>5</option>
-          <option value="4" style={{ background: '#1e293b', color: '#fff' }}>4</option>
-          <option value="3" style={{ background: '#1e293b', color: '#fff' }}>3</option>
-          <option value="2" style={{ background: '#1e293b', color: '#fff' }}>2</option>
-          <option value="1" style={{ background: '#1e293b', color: '#fff' }}>1</option>
-          <option value="unrated" style={{ background: '#1e293b', color: '#fff' }}>Unrated</option>
-        </select>
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        <MultiSelectDropdown
+          options={[
+            { value: 'ANIME', label: 'Anime' },
+            { value: 'MOVIE', label: 'Movie' },
+            { value: 'TV_SHOW', label: 'TV Show' },
+            { value: 'GAME', label: 'Game' },
+            { value: 'BOOK', label: 'Book' }
+          ]}
+          selectedValues={filters.type}
+          onChange={(values) => setFilters(prev => ({ ...prev, type: values }))}
+          placeholder="All Types"
+        />
+        <MultiSelectDropdown
+          options={[
+            { value: 'WATCHING', label: 'Watching' },
+            { value: 'PLAN_TO_WATCH', label: 'Plan to Watch' },
+            { value: 'COMPLETED', label: 'Completed' },
+            { value: 'PLAYING', label: 'Playing' },
+            { value: 'ON_HOLD', label: 'On Hold' },
+            { value: 'DROPPED', label: 'Dropped' }
+          ]}
+          selectedValues={filters.status}
+          onChange={(values) => setFilters(prev => ({ ...prev, status: values }))}
+          placeholder="All Statuses"
+        />
+        <MultiSelectDropdown
+          options={[
+            { value: '10', label: '10' },
+            { value: '9', label: '9' },
+            { value: '8', label: '8' },
+            { value: '7', label: '7' },
+            { value: '6', label: '6' },
+            { value: '5', label: '5' },
+            { value: '4', label: '4' },
+            { value: '3', label: '3' },
+            { value: '2', label: '2' },
+            { value: '1', label: '1' },
+            { value: 'unrated', label: 'Unrated' }
+          ]}
+          selectedValues={filters.rating}
+          onChange={(values) => setFilters(prev => ({ ...prev, rating: values }))}
+          placeholder="All Ratings"
+        />
         <button 
           onClick={() => setIsMoreFiltersOpen(!isMoreFiltersOpen)}
           className="btn btn-sm"

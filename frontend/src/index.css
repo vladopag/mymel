@@ -154,7 +154,8 @@ button:active, .btn:active {
 
 .glass-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: left;
   font-family: var(--font-family-body);
 }
