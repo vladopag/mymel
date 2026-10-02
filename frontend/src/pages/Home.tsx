@@ -25,7 +25,7 @@ export default function Home() {
           <p style={{ color: 'var(--text-secondary)' }}>Track episodes watched, status updates, and seasonal shows.</p>
         </div>
         <div className="glass-card" style={{ padding: '2rem' }}>
-          <h3 style={{ color: 'var(--primary-light)', marginBottom: '0.75rem' }}>🎮 Video Games</h3>
+          <h3 style={{ color: 'var(--primary-light)', marginBottom: '0.75rem' }}>🎮 Games</h3>
           <p style={{ color: 'var(--text-secondary)' }}>Log game completions, achievements, and hours played.</p>
         </div>
       </div>

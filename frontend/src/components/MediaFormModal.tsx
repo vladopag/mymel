@@ -86,7 +86,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
                 <option value="MOVIE">Movie</option>
                 <option value="TV_SHOW">TV Show</option>
                 <option value="ANIME">Anime</option>
-                <option value="GAME">Video Game</option>
+                <option value="GAME">Game</option>
               </select>
             </div>
 
