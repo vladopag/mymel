@@ -79,7 +79,21 @@ export default function Library() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState<MediaEntry | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [filters, setFilters] = useState<{ type: string[], status: string[], rating: string[] }>({ type: [], status: [], rating: [] })
+  const [filters, setFilters] = useState<{ type: string[], status: string[], rating: string[] }>(() => {
+    const saved = localStorage.getItem('mymel_library_filters');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse saved filters', e);
+      }
+    }
+    return { type: [], status: [], rating: [] };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('mymel_library_filters', JSON.stringify(filters));
+  }, [filters]);
   const [isMoreFiltersOpen, setIsMoreFiltersOpen] = useState(false)
   const [sortConfig, setSortConfig] = useState<{ key: keyof MediaEntry | null, direction: 'asc' | 'desc' }>({ key: 'title', direction: 'asc' })
   const progressSnapshotRef = useRef<Record<number, number>>({})
