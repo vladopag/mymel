@@ -13,6 +13,7 @@ export interface MediaEntry {
   totalEpisodes?: number;
   review?: string;
   personalNotes?: string;
+  author?: string;
 }
 
 const MultiSelectDropdown = ({ options, selectedValues, onChange, placeholder }: {

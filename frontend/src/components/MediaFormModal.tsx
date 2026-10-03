@@ -17,6 +17,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
   const [review, setReview] = useState('');
   const [personalNotes, setPersonalNotes] = useState('');
   const [totalEpisodes, setTotalEpisodes] = useState<number | ''>('');
+  const [author, setAuthor] = useState('');
 
   useEffect(() => {
     if (media) {
@@ -27,6 +28,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
       setReview(media.review || '');
       setPersonalNotes(media.personalNotes || '');
       setTotalEpisodes(media.totalEpisodes || '');
+      setAuthor(media.author || '');
     } else {
       setTitle('');
       setType('MOVIE');
@@ -35,6 +37,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
       setReview('');
       setPersonalNotes('');
       setTotalEpisodes('');
+      setAuthor('');
     }
   }, [media, isOpen]);
 
@@ -50,7 +53,8 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
       rating: rating > 0 ? rating : 0,
       review: review || '',
       personalNotes: personalNotes || '',
-      ...(totalEpisodes !== '' && { totalEpisodes: Number(totalEpisodes) })
+      ...(totalEpisodes !== '' && { totalEpisodes: Number(totalEpisodes) }),
+      ...(type === 'BOOK' && author && { author })
     });
   };
 
@@ -108,6 +112,19 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
               </select>
             </div>
           </div>
+
+          {type === 'BOOK' && (
+            <div className="form-group">
+              <label htmlFor="author">Author</label>
+              <input
+                type="text"
+                id="author"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                placeholder="e.g. Brandon Sanderson"
+              />
+            </div>
+          )}
 
           {(type === 'ANIME' || type === 'TV_SHOW') && (
             <div className="form-group">
