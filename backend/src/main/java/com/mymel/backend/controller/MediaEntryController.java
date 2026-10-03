@@ -79,25 +79,14 @@ public class MediaEntryController {
                     existingEntry.setCoverImageUrl(mediaEntryDetails.getCoverImageUrl());
                     existingEntry.setPersonalNotes(mediaEntryDetails.getPersonalNotes());
 
-                    if (existingEntry instanceof AnimeEntry && mediaEntryDetails instanceof AnimeEntry) {
-                        AnimeEntry e = (AnimeEntry) existingEntry;
-                        AnimeEntry d = (AnimeEntry) mediaEntryDetails;
-                        if (d.getEpisodesWatched() != null) {
-                            e.setEpisodesWatched(d.getEpisodesWatched());
-                        }
-                        if (d.getTotalEpisodes() != null) {
-                            e.setTotalEpisodes(d.getTotalEpisodes());
-                        }
-                    } else if (existingEntry instanceof TvShowEntry && mediaEntryDetails instanceof TvShowEntry) {
-                        TvShowEntry e = (TvShowEntry) existingEntry;
-                        TvShowEntry d = (TvShowEntry) mediaEntryDetails;
-                        if (d.getEpisodesWatched() != null) {
-                            e.setEpisodesWatched(d.getEpisodesWatched());
-                        }
-                        if (d.getTotalEpisodes() != null) {
-                            e.setTotalEpisodes(d.getTotalEpisodes());
-                        }
-                    } else if (existingEntry instanceof MovieEntry && mediaEntryDetails instanceof MovieEntry) {
+                    if (mediaEntryDetails.getEpisodesWatched() != null) {
+                        existingEntry.setEpisodesWatched(mediaEntryDetails.getEpisodesWatched());
+                    }
+                    if (mediaEntryDetails.getTotalEpisodes() != null) {
+                        existingEntry.setTotalEpisodes(mediaEntryDetails.getTotalEpisodes());
+                    }
+
+                    if (existingEntry instanceof MovieEntry && mediaEntryDetails instanceof MovieEntry) {
                         MovieEntry e = (MovieEntry) existingEntry;
                         MovieEntry d = (MovieEntry) mediaEntryDetails;
                         e.setDurationMinutes(d.getDurationMinutes());
@@ -108,8 +97,7 @@ public class MediaEntryController {
                     } else if (existingEntry instanceof BookEntry && mediaEntryDetails instanceof BookEntry) {
                         BookEntry e = (BookEntry) existingEntry;
                         BookEntry d = (BookEntry) mediaEntryDetails;
-                        e.setPagesRead(d.getPagesRead());
-                        e.setTotalPages(d.getTotalPages());
+                        e.setAuthor(d.getAuthor());
                     }
                     MediaEntry updatedEntry = mediaEntryRepository.save(existingEntry);
                     return ResponseEntity.ok(updatedEntry);
