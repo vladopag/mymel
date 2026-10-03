@@ -18,6 +18,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
   const [personalNotes, setPersonalNotes] = useState('');
   const [totalEpisodes, setTotalEpisodes] = useState<number | ''>('');
   const [author, setAuthor] = useState('');
+  const [episodesWatched, setEpisodesWatched] = useState<number | ''>('');
 
   useEffect(() => {
     if (media) {
@@ -29,6 +30,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
       setPersonalNotes(media.personalNotes || '');
       setTotalEpisodes(media.totalEpisodes || '');
       setAuthor(media.author || '');
+      setEpisodesWatched(media.episodesWatched !== undefined && media.episodesWatched !== null ? media.episodesWatched : '');
     } else {
       setTitle('');
       setType('MOVIE');
@@ -38,6 +40,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
       setPersonalNotes('');
       setTotalEpisodes('');
       setAuthor('');
+      setEpisodesWatched('');
     }
   }, [media, isOpen]);
 
@@ -46,7 +49,7 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
-      ...(media?.episodesWatched !== undefined && { episodesWatched: media.episodesWatched }),
+      ...(episodesWatched !== '' && { episodesWatched: Number(episodesWatched) }),
       title,
       type,
       status,
@@ -126,17 +129,37 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
             </div>
           )}
 
-          {(type === 'ANIME' || type === 'TV_SHOW') && (
-            <div className="form-group">
-              <label htmlFor="totalEpisodes">Total Episodes (Optional)</label>
-              <input
-                type="number"
-                id="totalEpisodes"
-                value={totalEpisodes}
-                onChange={(e) => setTotalEpisodes(e.target.value === '' ? '' : parseInt(e.target.value))}
-                min="1"
-                placeholder="e.g. 24"
-              />
+          {type !== 'MOVIE' && (
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <div className="form-group" style={{ flex: 1 }}>
+                <label htmlFor="episodesWatched">
+                  {type === 'BOOK' ? 'Pages Read' : type === 'GAME' ? 'Hours Played' : 'Episodes Watched'}
+                </label>
+                <input
+                  type="number"
+                  id="episodesWatched"
+                  value={episodesWatched}
+                  onChange={(e) => setEpisodesWatched(e.target.value === '' ? '' : parseInt(e.target.value))}
+                  min="0"
+                  placeholder="e.g. 0"
+                />
+              </div>
+
+              {type !== 'GAME' && (
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label htmlFor="totalEpisodes">
+                    {type === 'BOOK' ? 'Total Pages' : 'Total Episodes (Optional)'}
+                  </label>
+                  <input
+                    type="number"
+                    id="totalEpisodes"
+                    value={totalEpisodes}
+                    onChange={(e) => setTotalEpisodes(e.target.value === '' ? '' : parseInt(e.target.value))}
+                    min="1"
+                    placeholder={type === 'BOOK' ? 'e.g. 350' : 'e.g. 24'}
+                  />
+                </div>
+              )}
             </div>
           )}
 

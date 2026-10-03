@@ -56,6 +56,15 @@ public abstract class MediaEntry {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    private Integer episodesWatched = 0;
+    private Integer totalEpisodes;
+
+    public Integer getEpisodesWatched() { return episodesWatched; }
+    public void setEpisodesWatched(Integer episodesWatched) { this.episodesWatched = episodesWatched; }
+
+    public Integer getTotalEpisodes() { return totalEpisodes; }
+    public void setTotalEpisodes(Integer totalEpisodes) { this.totalEpisodes = totalEpisodes; }
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 

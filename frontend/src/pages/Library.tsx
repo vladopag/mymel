@@ -181,9 +181,9 @@ export default function Library() {
       if (previousMedia) {
         queryClient.setQueryData<MediaEntry[]>(['media'], (old) =>
           old?.map((item) => {
-            if (item.id === id && (item.type === 'ANIME' || item.type === 'TV_SHOW')) {
+            if (item.id === id && item.type !== 'GAME') {
               const current = item.episodesWatched ?? 0
-              const max = item.totalEpisodes && item.totalEpisodes > 0 ? item.totalEpisodes : Infinity
+              const max = item.type === 'MOVIE' ? 1 : (item.totalEpisodes && item.totalEpisodes > 0 ? item.totalEpisodes : Infinity)
               const updated = Math.min(max, Math.max(0, current + delta))
               return { ...item, episodesWatched: updated }
             }
@@ -410,26 +410,56 @@ export default function Library() {
                     </span>
                   </td>
                   <td>
-                    {media.type === 'ANIME' || media.type === 'TV_SHOW' ? (
+                    {media.type === 'GAME' ? (
+                      <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                        {media.episodesWatched ?? 0} hours
+                      </span>
+                    ) : media.type === 'BOOK' ? (
+                      <div className="quick-tracker">
+                        <input
+                          type="number"
+                          defaultValue={media.episodesWatched ?? 0}
+                          onBlur={(e) => {
+                            const val = parseInt(e.target.value);
+                            if (!isNaN(val) && val !== (media.episodesWatched ?? 0)) {
+                               quickTrackMutation.mutate({ id: media.id, delta: val - (media.episodesWatched ?? 0) });
+                            }
+                          }}
+                          style={{
+                            width: '60px',
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            color: '#fff',
+                            borderRadius: '4px',
+                            padding: '0.25rem',
+                            textAlign: 'center'
+                          }}
+                        />
+                        <span style={{ marginLeft: '8px', color: 'var(--text-secondary)' }}>
+                           / {media.totalEpisodes && media.totalEpisodes > 0 ? media.totalEpisodes : '?'}
+                        </span>
+                      </div>
+                    ) : (media.type === 'ANIME' || media.type === 'TV_SHOW' || media.type === 'MOVIE') ? (
                       <div className="quick-tracker">
                         <button
                           className="quick-tracker-btn"
-                          aria-label="Decrement episode"
+                          aria-label="Decrement progress"
                           disabled={quickTrackMutation.isPending || (media.episodesWatched ?? 0) <= 0}
                           onClick={() => quickTrackMutation.mutate({ id: media.id, delta: -1 })}
                         >
                           -
                         </button>
                         <span className="quick-tracker-count">
-                          {media.episodesWatched ?? 0} / {media.totalEpisodes && media.totalEpisodes > 0 ? media.totalEpisodes : '?'}
+                          {media.episodesWatched ?? 0} / {media.totalEpisodes && media.totalEpisodes > 0 ? media.totalEpisodes : (media.type === 'MOVIE' ? '1' : '?')}
                         </span>
                         <button
                           className="quick-tracker-btn"
-                          aria-label="Increment episode"
+                          aria-label="Increment progress"
                           disabled={
                             quickTrackMutation.isPending ||
                             (Boolean(media.totalEpisodes && media.totalEpisodes > 0) &&
-                              (media.episodesWatched ?? 0) >= (media.totalEpisodes ?? 0))
+                              (media.episodesWatched ?? 0) >= (media.totalEpisodes ?? 0)) ||
+                            (media.type === 'MOVIE' && (media.episodesWatched ?? 0) >= 1)
                           }
                           onClick={() => quickTrackMutation.mutate({ id: media.id, delta: 1 })}
                         >
