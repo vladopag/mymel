@@ -94,13 +94,15 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
             <div className="form-group">
               <label htmlFor="status">Status</label>
               <select id="status" value={status} onChange={(e) => setStatus(e.target.value as MediaEntry['status'])}>
-                <option value="PLAN_TO_WATCH">{type === 'GAME' ? 'Plan to Play' : 'Plan to Watch'}</option>
+                <option value="PLAN_TO_WATCH">{type === 'GAME' ? 'Plan to Play' : type === 'BOOK' ? 'Plan to Read' : 'Plan to Watch'}</option>
                 {type === 'GAME' ? (
                   <option value="PLAYING">Playing</option>
+                ) : type === 'BOOK' ? (
+                  <option value="WATCHING">Reading</option>
                 ) : (
                   <option value="WATCHING">Watching</option>
                 )}
-                <option value="COMPLETED">Completed</option>
+                <option value="COMPLETED">{type === 'BOOK' ? 'Read' : 'Completed'}</option>
                 <option value="ON_HOLD">On Hold</option>
                 <option value="DROPPED">Dropped</option>
               </select>
