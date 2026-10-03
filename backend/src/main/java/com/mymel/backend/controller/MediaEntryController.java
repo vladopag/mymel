@@ -114,29 +114,18 @@ public class MediaEntryController {
                         return ResponseEntity.status(HttpStatus.FORBIDDEN).<MediaEntry>build();
                     }
 
-                    if (existingEntry instanceof AnimeEntry) {
-                        AnimeEntry anime = (AnimeEntry) existingEntry;
-                        int current = anime.getEpisodesWatched() != null ? anime.getEpisodesWatched() : 0;
-                        int updated = Math.max(0, current + delta);
-                        if (anime.getTotalEpisodes() != null && anime.getTotalEpisodes() > 0) {
-                            updated = Math.min(anime.getTotalEpisodes(), updated);
-                        }
-                        anime.setEpisodesWatched(updated);
-                        MediaEntry saved = mediaEntryRepository.save(anime);
-                        return ResponseEntity.ok(saved);
-                    } else if (existingEntry instanceof TvShowEntry) {
-                        TvShowEntry tv = (TvShowEntry) existingEntry;
-                        int current = tv.getEpisodesWatched() != null ? tv.getEpisodesWatched() : 0;
-                        int updated = Math.max(0, current + delta);
-                        if (tv.getTotalEpisodes() != null && tv.getTotalEpisodes() > 0) {
-                            updated = Math.min(tv.getTotalEpisodes(), updated);
-                        }
-                        tv.setEpisodesWatched(updated);
-                        MediaEntry saved = mediaEntryRepository.save(tv);
-                        return ResponseEntity.ok(saved);
-                    } else {
-                        return ResponseEntity.badRequest().<MediaEntry>build();
+                    int current = existingEntry.getEpisodesWatched() != null ? existingEntry.getEpisodesWatched() : 0;
+                    int updated = Math.max(0, current + delta);
+                    
+                    if (existingEntry instanceof MovieEntry) {
+                        updated = Math.min(1, updated);
+                    } else if (existingEntry.getTotalEpisodes() != null && existingEntry.getTotalEpisodes() > 0) {
+                        updated = Math.min(existingEntry.getTotalEpisodes(), updated);
                     }
+                    
+                    existingEntry.setEpisodesWatched(updated);
+                    MediaEntry saved = mediaEntryRepository.save(existingEntry);
+                    return ResponseEntity.ok(saved);
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
