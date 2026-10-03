@@ -210,15 +210,15 @@ button:active, .btn:active {
 }
 
 .status-chip.plan_to_watch {
-  background: rgba(253, 224, 71, 0.15);
-  color: #fde047;
-  border: 1px solid rgba(253, 224, 71, 0.3);
+  background: rgba(192, 132, 252, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(192, 132, 252, 0.3);
 }
 
 .status-chip.on_hold {
-  background: rgba(251, 146, 60, 0.15);
-  color: #fb923c;
-  border: 1px solid rgba(251, 146, 60, 0.3);
+  background: rgba(253, 224, 71, 0.15);
+  color: #fde047;
+  border: 1px solid rgba(253, 224, 71, 0.3);
 }
 
 .status-chip.dropped {
