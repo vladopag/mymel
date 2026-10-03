@@ -83,10 +83,11 @@ export default function MediaFormModal({ isOpen, onClose, media, onSubmit }: Med
                 if (newType === 'GAME' && status === 'WATCHING') setStatus('PLAYING');
                 if (newType !== 'GAME' && status === 'PLAYING') setStatus('WATCHING');
               }}>
+                <option value="ANIME">Anime</option>
                 <option value="MOVIE">Movie</option>
                 <option value="TV_SHOW">TV Show</option>
-                <option value="ANIME">Anime</option>
                 <option value="GAME">Game</option>
+                <option value="BOOK">Book</option>
               </select>
             </div>
 
