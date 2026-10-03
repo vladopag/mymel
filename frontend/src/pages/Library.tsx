@@ -417,12 +417,19 @@ export default function Library() {
                     ) : media.type === 'BOOK' ? (
                       <div className="quick-tracker">
                         <input
+                          key={media.episodesWatched ?? 0}
+                          className="no-spin-button"
                           type="number"
                           defaultValue={media.episodesWatched ?? 0}
                           onBlur={(e) => {
                             const val = parseInt(e.target.value);
                             if (!isNaN(val) && val !== (media.episodesWatched ?? 0)) {
                                quickTrackMutation.mutate({ id: media.id, delta: val - (media.episodesWatched ?? 0) });
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.currentTarget.blur();
                             }
                           }}
                           style={{

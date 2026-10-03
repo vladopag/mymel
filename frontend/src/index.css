@@ -227,6 +227,17 @@ button:active, .btn:active {
   border: 1px solid rgba(248, 113, 113, 0.3);
 }
 
+/* Hide spin buttons for number inputs */
+.no-spin-button::-webkit-outer-spin-button,
+.no-spin-button::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spin-button {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 /* Action button styles inside table */
 .btn-sm {
   padding: 0.4rem 0.8rem;
