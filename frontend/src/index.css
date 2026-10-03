@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root {
+  color-scheme: dark;
   /* Tropical Theme Color System */
   --primary-color: #5b8bc4;         /* Lighter San Marino Blue */
   --primary-dark: #406c9c;
@@ -323,7 +324,6 @@ button:active, .btn:active {
 }
 
 .form-group select option {
-  background: #12243a;
   color: var(--text-main);
 }
 
